@@ -24,7 +24,8 @@ class ClientAddr(object):
         )
 
     The tween checks if ``X-Forwarded-For`` is present and if it is, takes
-    the last IP in the ``X-Forwarded-For`` list and writes it to
+    the last IP in the ``X-Forwarded-For`` list and makes it the only IP
+    in the list. This effectively causes pyramid to return this real IP for
     ``request.client_addr``. Read rationale behind why we do this on
     https://github.com/niteoweb/heroku_ips.
     """
@@ -35,6 +36,6 @@ class ClientAddr(object):
 
     def __call__(self, request):
         if request.headers.get('X-Forwarded-For'):
-            request.client_addr = \
+            request.headers['X-Forwarded-For'] = \
                 request.headers['X-Forwarded-For'].split(',')[-1].strip()
         return self.handler(request)
