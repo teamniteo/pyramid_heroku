@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 
 def includeme(config):
-    config.add_tween('pyramid_heroku.ClientAddr')
+    config.add_tween('pyramid_heroku.client_addr.ClientAddr')
 
 
 class ClientAddr(object):

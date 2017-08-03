@@ -7,7 +7,7 @@ import logging
 
 
 def includeme(config):
-    config.add_tween('pyramid_heroku.HerokuappAccess')
+    config.add_tween('pyramid_heroku.herokuapp_access.HerokuappAccess')
 
 
 class HerokuappAccess(object):
