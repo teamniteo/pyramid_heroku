@@ -3,7 +3,8 @@
 from __future__ import unicode_literals
 from pyramid.response import Response
 
-import logging
+import structlog
+logger = structlog.getLogger(__name__)
 
 
 def includeme(config):
@@ -36,20 +37,11 @@ class HerokuappAccess(object):
             'herokuapp.com' in request.headers['Host'] and
             request.client_addr not in whitelisted_ips
         ):
-            if request.registry.settings.get('pyramid_heroku.structlog'):
-                import structlog
-                logger = structlog.getLogger(__name__)
-                logger.info(
-                    'Herokuapp access denied',
-                    user_ip=request.client_addr,
-                    host=request.headers['Host'],
-                )
-            else:
-                logger = logging.getLogger(__name__)
-                logger.info(
-                    'Denied Herokuapp access for Host {} and IP {}'.format(
-                        request.headers['Host'], request.client_addr))
-
+            logger.info(
+                'Herokuapp access denied',
+                user_ip=request.client_addr,
+                host=request.headers['Host'],
+            )
             resp = Response(
                 'Unauthorized.',
                 status=403,
