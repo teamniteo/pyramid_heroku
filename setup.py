@@ -11,6 +11,7 @@ requires = [
     'pyramid>=1.7',
     'requests',
     'future',
+    'structlog',
 ]
 
 tests_require = [
