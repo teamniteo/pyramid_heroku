@@ -157,19 +157,25 @@ class Heroku(object):
 
 def main():
     parser = argparse.ArgumentParser(
-        usage='python -m pyramid_heroku.migrate my_app etc/production.ini app:main',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        usage=(
+            'usage: migrate.py [-h] app_name [ini_file] [app_section]'
+            '\nexample: python -m pyramid_heroku.migrate my_app etc/production.ini app:main'),
     )
+    parser.add_argument('app_name', help='Heroku app name')
     parser.add_argument(
-        'app_name', type=str, metavar='<app_name>',
-        help='Heroku app name')
+        'ini_file',
+        nargs='?',
+        default='etc/production.ini',
+        help='Path to Pyramid configuration file ')
     parser.add_argument(
-        'ini_file', type=str, metavar='<ini_file>',
-        help='Path to Pyramid configuration file, i.e. etc/production.ini')
-    parser.add_argument(
-        'app_section', type=str, metavar='<app_section>',
+        'app_section',
+        nargs='?',
+        default='app:main',
         help='App section name in ini configuration file')
 
     options = parser.parse_args()
+
     Heroku(options.app_name, options.ini_file, options.app_section).migrate()
 
 
