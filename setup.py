@@ -12,6 +12,7 @@ requires = [
     'requests',
     'future',
     'structlog',
+    'six',
 ]
 
 tests_require = [

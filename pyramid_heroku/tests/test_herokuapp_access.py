@@ -7,6 +7,7 @@ from zope.testing.loggingsupport import InstalledHandler
 
 import mock
 import unittest
+import six
 
 tweens_handler = InstalledHandler('pyramid_heroku.herokuapp_access')
 
@@ -53,7 +54,11 @@ class TestHerokuappAccessTween(unittest.TestCase):
             self.handler, self.request.registry)(self.request)
         assert not self.handler.called, 'handler should not be called'
         self.assertEqual(len(tweens_handler.records), 1)
-        msg = 'Herokuapp access denied        host=foo.herokuapp.com user_ip=6.6.6.6'
+        msg = (
+            'Herokuapp access denied        host=foo.herokuapp.com user_ip=6.6.6.6'
+            if six.PY3 else
+            "Herokuapp access denied        host=u'foo.herokuapp.com' user_ip=u'6.6.6.6'")
+        # import pdb; pdb.set_trace()
         self.assertTrue(msg in tweens_handler.records[0].msg)
         self.assertEqual(response.status_code, 403)
 
