@@ -14,6 +14,30 @@ class TestHerokuMigrate(unittest.TestCase):
         from pyramid_heroku.migrate import Heroku
         self.Heroku = Heroku
 
+    def test_default_values(self):
+        from pyramid_heroku.migrate import main
+
+        def assert_args(args, called_with):
+            with mock.patch('sys.argv', ['migrate.py'] + args),\
+                 mock.patch('pyramid_heroku.migrate.Heroku') as heroku:
+                main()
+            heroku.assert_called_with(*called_with)
+
+        # all default
+        assert_args(
+            ['my_test_app'],
+            ['my_test_app', 'etc/production.ini', 'app:main'])
+
+        # only app_section default
+        assert_args(
+            ['my_test_app', 'etc/develop.ini'],
+            ['my_test_app', 'etc/develop.ini', 'app:main'])
+
+        # all custom
+        assert_args(
+            ['my_test_app', 'etc/develop2.ini', 'app:main2'],
+            ['my_test_app', 'etc/develop2.ini', 'app:main2'])
+
     @responses.activate
     @mock.patch('pyramid_heroku.migrate.print')
     def test_scale_down(self, out):

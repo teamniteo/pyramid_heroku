@@ -2,6 +2,12 @@
 Changes
 =======
 
+0.1.3
+-----
+
+* Provided default values for migrate.py - https://github.com/niteoweb/pyramid_heroku/issues/2
+  [enkidulan]
+
 0.1.2
 -----
 
