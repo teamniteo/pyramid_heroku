@@ -93,7 +93,7 @@ class Heroku(object):
         :param cmd: shell command to run
         :return: stdout of command
         """
-        return subprocess.check_output(shlex.split(cmd))
+        return subprocess.check_output(shlex.split(cmd)).decode()
 
     def needs_migrate(self):
         """
