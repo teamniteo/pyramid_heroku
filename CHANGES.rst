@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.1.4
+-----
+
+* Fix return value in migrate.shell. `subprocess.check_output` changed in
+  python 3.6 and is now returning byte and not str.
+  [karantan]
+
 0.1.3
 -----
 
