@@ -104,7 +104,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.subprocess')
     def test_needs_migrate(self, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = ''
+        sub.check_output.return_value = b''
         self.assertTrue(h.needs_migrate())
         sub.check_output.assert_called_with(
             ['bin/alembic', '-c', 'etc/production.ini',
@@ -115,7 +115,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.subprocess')
     def test_does_not_need_migrate(self, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = 'head'
+        sub.check_output.return_value = b'head'
         self.assertFalse(h.needs_migrate())
         sub.check_output.assert_called_with(
             ['bin/alembic', '-c', 'etc/production.ini',
@@ -126,7 +126,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.subprocess')
     def test_alembic(self, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = 'Migration done'
+        sub.check_output.return_value = b'Migration done'
         self.assertEqual(h.alembic(), 'Migration done')
         sub.check_output.assert_called_with(
             ['bin/alembic', '-c', 'etc/production.ini', '-n', 'app:main',
@@ -139,7 +139,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.sleep')
     def test_migrate_skip(self, sleep, out, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = 'head'
+        sub.check_output.return_value = b'head'
         h.migrate()
         sub.check_output.assert_called_with(
             ['bin/alembic', '-c', 'etc/production.ini',
@@ -155,7 +155,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.Session')
     def test_migrate(self, ses, sleep, out, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = ''
+        sub.check_output.return_value = b''
         h.migrate()
         sub.check_output.assert_called_with(
             ['bin/alembic', '-c', 'etc/production.ini', '-n', 'app:main',
