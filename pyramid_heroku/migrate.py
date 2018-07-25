@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import print_function
-from __future__ import unicode_literals
-from future.utils import iteritems
+"""Graceful DB migrations."""
 
 from requests import Session
 from time import sleep
@@ -30,7 +26,7 @@ class Heroku(object):
         self.app_section = app_section
 
         headers = {
-            'Authorization': 'Bearer {0.auth_key}'.format(self),
+            f'Authorization': 'Bearer {self.auth_key}',
             'Accept': 'application/vnd.heroku+json; version=3',
             'Content-Type': 'application/json',
         }
@@ -50,26 +46,25 @@ class Heroku(object):
         """Scale all app workers to 0."""
         updates = [dict(type=t, quantity=0) for t in self.formation.keys()]
         res = self.session.patch(
-            '{0.api_endpoint}/apps/{0.app_name}/formation'.format(self),
+            f'{self.api_endpoint}/apps/{self.app_name}/formation',
             json=dict(updates=updates),
         )
         self.parse_response(res)
         print('Scaled down to:')
         for x in res.json():
-            print('{}={}'.format(x['type'], x['quantity']))
+            print(f'{x["type"]}={x["quantity"]}')
 
     def scale_up(self):
         """Scale app back to initial state."""
-        updates = [dict(type=t, quantity=s) for t, s in
-                   iteritems(self.formation)]
+        updates = [dict(type=t, quantity=s) for t, s in self.formation.items()]
         res = self.session.patch(
-            '{0.api_endpoint}/apps/{0.app_name}/formation'.format(self),
+            f'{self.api_endpoint}/apps/{self.app_name}/formation',
             json=dict(updates=updates),
         )
         self.parse_response(res)
         print('Scaled up to:')
         for x in res.json():
-            print('{}={}'.format(x['type'], x['quantity']))
+            print(f'{x["type"]}={x["quantity"]}')
 
     @property
     def formation(self):
@@ -79,8 +74,7 @@ class Heroku(object):
         """
         if not self._formation:
             res = self.session.get(
-                '{0.api_endpoint}/apps/{0.app_name}/formation'.format(self)
-            )
+                f'{self.api_endpoint}/apps/{self.app_name}/formation')
             self.parse_response(res)
             self._formation = {x['type']: x['quantity'] for x in res.json()}
         return self._formation
@@ -101,8 +95,8 @@ class Heroku(object):
 
         :return: True if current alembic branch is not up to date.
         """
-        cmd = self.shell('bin/alembic -c {0.ini_file}'
-                         ' -n {0.app_section} current'.format(self))
+        cmd = self.shell(f'bin/alembic -c {self.ini_file}'
+                         f' -n {self.app_section} current')
         print(cmd)
         return 'head' not in cmd
 
@@ -112,13 +106,13 @@ class Heroku(object):
 
         :return: alembic stdout
         """
-        return self.shell('bin/alembic -c {0.ini_file}'
-                          ' -n {0.app_section} upgrade head'.format(self))
+        return self.shell(f'bin/alembic -c {self.ini_file}'
+                          f' -n {self.app_section} upgrade head')
 
     def set_maintenance(self, state):
         # type: (bool) -> ()
         res = self.session.patch(
-            '{0.api_endpoint}/apps/{0.app_name}'.format(self),
+            f'{self.api_endpoint}/apps/{self.app_name}',
             json=dict(maintenance=state),
         )
         if self.parse_response(res):

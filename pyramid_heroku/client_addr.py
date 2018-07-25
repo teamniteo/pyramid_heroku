@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
+"""Set client_add IP that we can trust."""
 
 def includeme(config):
     config.add_tween('pyramid_heroku.client_addr.ClientAddr')

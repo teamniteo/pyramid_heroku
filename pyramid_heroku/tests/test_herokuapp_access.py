@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Tests for HerokuappAccess tween."""
 
-from __future__ import unicode_literals
 from pyramid import testing
 from zope.testing.loggingsupport import InstalledHandler
 
