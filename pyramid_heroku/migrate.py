@@ -95,7 +95,7 @@ class Heroku(object):
 
         :return: True if current alembic branch is not up to date.
         """
-        cmd = self.shell(f'bin/alembic -c {self.ini_file}'
+        cmd = self.shell(f'alembic -c {self.ini_file}'
                          f' -n {self.app_section} current')
         print(cmd)
         return 'head' not in cmd
@@ -106,7 +106,7 @@ class Heroku(object):
 
         :return: alembic stdout
         """
-        return self.shell(f'bin/alembic -c {self.ini_file}'
+        return self.shell(f'alembic -c {self.ini_file}'
                           f' -n {self.app_section} upgrade head')
 
     def set_maintenance(self, state):

@@ -34,7 +34,7 @@ def expandvars_dict(settings: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
 
     $ export FOO='foo'
     $ export BAR='${FOO}bar'
-    $ bin/py
+    $ python
     >>> from pyramid_heroku import expandvars_dict
     >>> expandvars_dict({'my_var': '${BAR}'})
     {'my_var': 'foobar'}

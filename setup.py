@@ -15,7 +15,7 @@ requires = [
 
 setup(
     name='pyramid_heroku',
-    version='0.2',
+    version='0.3',
     description='A bunch of helpers for successfully running Pyramid on Heroku.',
     long_description=readme + '\n' + changes,
     classifiers=[

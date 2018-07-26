@@ -106,7 +106,7 @@ class TestHerokuMigrate(unittest.TestCase):
         sub.check_output.return_value = b''
         self.assertTrue(h.needs_migrate())
         sub.check_output.assert_called_with(
-            ['bin/alembic', '-c', 'etc/production.ini',
+            ['alembic', '-c', 'etc/production.ini',
              '-n', 'app:main', 'current']
         )
 
@@ -117,7 +117,7 @@ class TestHerokuMigrate(unittest.TestCase):
         sub.check_output.return_value = b'head'
         self.assertFalse(h.needs_migrate())
         sub.check_output.assert_called_with(
-            ['bin/alembic', '-c', 'etc/production.ini',
+            ['alembic', '-c', 'etc/production.ini',
              '-n', 'app:main', 'current']
         )
 
@@ -128,7 +128,7 @@ class TestHerokuMigrate(unittest.TestCase):
         sub.check_output.return_value = b'Migration done'
         self.assertEqual(h.alembic(), 'Migration done')
         sub.check_output.assert_called_with(
-            ['bin/alembic', '-c', 'etc/production.ini', '-n', 'app:main',
+            ['alembic', '-c', 'etc/production.ini', '-n', 'app:main',
              'upgrade', 'head']
         )
 
@@ -141,7 +141,7 @@ class TestHerokuMigrate(unittest.TestCase):
         sub.check_output.return_value = b'head'
         h.migrate()
         sub.check_output.assert_called_with(
-            ['bin/alembic', '-c', 'etc/production.ini',
+            ['alembic', '-c', 'etc/production.ini',
              '-n', 'app:main', 'current']
         )
         out.assert_has_calls(
@@ -157,6 +157,6 @@ class TestHerokuMigrate(unittest.TestCase):
         sub.check_output.return_value = b''
         h.migrate()
         sub.check_output.assert_called_with(
-            ['bin/alembic', '-c', 'etc/production.ini', '-n', 'app:main',
+            ['alembic', '-c', 'etc/production.ini', '-n', 'app:main',
              'upgrade', 'head']
         )

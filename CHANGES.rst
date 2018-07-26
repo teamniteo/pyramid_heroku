@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.3
+---
+
+ * Drop support for zc.buildout environments.
+   [zupo]
+
+
 0.2
 ---
 
