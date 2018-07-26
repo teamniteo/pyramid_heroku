@@ -26,7 +26,7 @@ class Heroku(object):
         self.app_section = app_section
 
         headers = {
-            f'Authorization': 'Bearer {self.auth_key}',
+            'Authorization': f'Bearer {self.auth_key}',
             'Accept': 'application/vnd.heroku+json; version=3',
             'Content-Type': 'application/json',
         }

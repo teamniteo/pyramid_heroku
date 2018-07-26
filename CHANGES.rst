@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.3.1
+-----
+
+ * Fix auth bug in migrate.py.
+   [zupo]
+
+
 0.3
 ---
 
