@@ -2,6 +2,24 @@
 Changes
 =======
 
+0.2
+---
+
+* Expand all environment variables in the settings dictionary. This allows you
+  to have, for example `${DATABASE_URL}` to get db connection string from
+  environment into your `production.ini` file.
+  [zupo]
+
+* Use pipenv for setting up development.
+  [zupo]
+
+* Add basic type hinting.
+  [zupo]
+
+* Drop support for Python versions older than 3.7.
+  [zupo]
+
+
 0.1.5
 -----
 
@@ -34,6 +52,7 @@ Changes
 
 * Fix tween paths.
   [zupo]
+
 
 
 0.1

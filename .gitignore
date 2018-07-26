@@ -8,19 +8,11 @@
 *.egg
 *.egg-info
 dist
-build
-include
-lib
 man
 local
 eggs
-parts
-bin
 var
 sdist
-develop-eggs
-.installed.cfg
-.eggs/
 pip-selfcheck.json
 
 # Installer logs
@@ -33,10 +25,7 @@ pip-log.txt
 #Translations
 *.mo
 
-#Mr Developer
-.mr.developer.cfg
-
-env
-env27
 coverage.xml
-nosetests.xml
+.pytest_cache/
+htmlcov/
+.venv/

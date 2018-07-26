@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pyramid-heroku = {editable = true, path = "."}
+
+[dev-packages]
+mock = "*"
+responses = "*"
+"zope.testing" = "*"
+coverage = "*"
+pytest = "*"
+docutils = "*"
+
+[requires]
+python_version = "3.7"

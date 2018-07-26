@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
+"""Prevent .herokuapp.com access to non-whitelisted IPs"""
 
-from __future__ import unicode_literals
 from pyramid.response import Response
 
 import logging
@@ -47,8 +46,8 @@ class HerokuappAccess(object):
             else:
                 logger = logging.getLogger(__name__)
                 logger.info(
-                    'Denied Herokuapp access for Host {} and IP {}'.format(
-                        request.headers['Host'], request.client_addr))
+                    f'Denied Herokuapp access for Host {request.headers["Host"]}'
+                    f' and IP {request.client_addr}')
 
             resp = Response(
                 'Unauthorized.',

@@ -10,18 +10,12 @@ changes = open(os.path.join(here, 'CHANGES.rst')).read()
 requires = [
     'pyramid>=1.7',
     'requests',
-    'future',
 ]
 
-tests_require = [
-    'mock',
-    'responses',
-    'zope.testing',
-]
 
 setup(
     name='pyramid_heroku',
-    version='0.1.5',
+    version='0.2',
     description='A bunch of helpers for successfully running Pyramid on Heroku.',
     long_description=readme + '\n' + changes,
     classifiers=[
@@ -31,17 +25,18 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Framework :: Pylons",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     packages=['pyramid_heroku'],
     install_requires=requires,
-    author='NiteoWeb Ltd.',
-    author_email='info@niteoweb.com',
+    author='Niteo',
+    author_email='info@niteo.co',
     license='BSD',
     url='https://github.com/niteoweb/pyramid_heroku',
     keywords='pyramid heroku pylons web',
-    tests_require=requires + tests_require,
     test_suite='pyramid_heroku',
 )

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Tests for ClientAddr tween."""
 
-from __future__ import unicode_literals
 from pyramid import request
 from pyramid import testing
 

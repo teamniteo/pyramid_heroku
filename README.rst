@@ -1,7 +1,6 @@
 pyramid_heroku
-================
+==============
 
-------------
 Introduction
 ------------
 
@@ -15,7 +14,7 @@ It provides the following:
 * ``migrate.py`` script for automatically running alembic migrations on
   deploy.
 
-------------
+
 Installation
 ------------
 
@@ -27,14 +26,14 @@ or
 
 ``easy_install pyramid_heroku``
 
--------------
+
 Compatibility
 -------------
 
 pyramid_heroku runs with pyramid>=1.7 and python>=2.7 and python>=3.5.
 Other versions might also work.
 
--------------
+
 Documentation
 -------------
 
@@ -77,11 +76,12 @@ Releasing
 
 #. Update CHANGES.rst.
 #. Update setup.py version.
-#. Run ``bin/longtest``.
-#. Run ``python setup.py sdist upload``.
+#. Run ``pipenv run python setup.py check -rs``.
+#. Run ``pipenv run python setup.py sdist upload``.
+
 
 We're hiring!
-=============
+-------------
 
 At Niteo we regularly contribute back to the Open Source community. If you do too, we'd like to invite you to `join our team
 <https://niteo.co/careers/>`_!

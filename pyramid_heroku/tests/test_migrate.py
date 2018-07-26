@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for Heroku migrate script."""
 
 from mock import call
