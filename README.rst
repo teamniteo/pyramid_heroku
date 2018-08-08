@@ -30,7 +30,7 @@ or
 Compatibility
 -------------
 
-pyramid_heroku runs with pyramid>=1.7 and python>=2.7 and python>=3.5.
+pyramid_heroku runs with pyramid>=1.7 and python>=3.6.
 Other versions might also work.
 
 
