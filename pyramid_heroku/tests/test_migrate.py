@@ -3,6 +3,7 @@
 from mock import call
 
 import mock
+import pytest
 import responses
 import unittest
 
@@ -103,33 +104,41 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.subprocess')
     def test_needs_migrate(self, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = b''
+        sub.run.stdout.return_value = b''
         self.assertTrue(h.needs_migrate())
-        sub.check_output.assert_called_with(
+        sub.run.assert_called_with(
             ['alembic', '-c', 'etc/production.ini',
-             '-n', 'app:main', 'current']
+             '-n', 'app:main', 'current'],
+            stdout=mock.ANY, stderr=mock.ANY
         )
 
     @responses.activate
     @mock.patch('pyramid_heroku.migrate.subprocess')
     def test_does_not_need_migrate(self, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = b'head'
+        p = mock.Mock()
+        p.stdout = b'head'
+        sub.run.return_value = p
         self.assertFalse(h.needs_migrate())
-        sub.check_output.assert_called_with(
+        sub.run.assert_called_with(
             ['alembic', '-c', 'etc/production.ini',
-             '-n', 'app:main', 'current']
+             '-n', 'app:main', 'current'],
+            stdout=mock.ANY, stderr=mock.ANY
         )
 
     @responses.activate
     @mock.patch('pyramid_heroku.migrate.subprocess')
     def test_alembic(self, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = b'Migration done'
-        self.assertEqual(h.alembic(), 'Migration done')
-        sub.check_output.assert_called_with(
+        p = mock.Mock()
+        p.stdout = b'head'
+        sub.run.return_value = p
+        h.alembic()
+        # TODO: print(migration done)
+        sub.run.assert_called_with(
             ['alembic', '-c', 'etc/production.ini', '-n', 'app:main',
-             'upgrade', 'head']
+             'upgrade', 'head'],
+            stdout=mock.ANY, stderr=mock.ANY
         )
 
     @responses.activate
@@ -138,14 +147,17 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.sleep')
     def test_migrate_skip(self, sleep, out, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = b'head'
+        p = mock.Mock()
+        p.stdout = b'head'
+        sub.run.return_value = p
         h.migrate()
-        sub.check_output.assert_called_with(
+        sub.run.assert_called_with(
             ['alembic', '-c', 'etc/production.ini',
-             '-n', 'app:main', 'current']
+             '-n', 'app:main', 'current'],
+            stdout=mock.ANY, stderr=mock.ANY
         )
         out.assert_has_calls(
-            [call('head'), call('Database migration is not needed')])
+            [call('head'), call('Database migration is not needed')], any_order=True)
 
     @responses.activate
     @mock.patch('pyramid_heroku.migrate.subprocess')
@@ -154,9 +166,28 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch('pyramid_heroku.migrate.Session')
     def test_migrate(self, ses, sleep, out, sub):
         h = self.Heroku('test', 'etc/production.ini', 'app:main')
-        sub.check_output.return_value = b''
         h.migrate()
-        sub.check_output.assert_called_with(
+        sub.run.assert_called_with(
             ['alembic', '-c', 'etc/production.ini', '-n', 'app:main',
-             'upgrade', 'head']
+             'upgrade', 'head'],
+            stdout=mock.ANY, stderr=mock.ANY
         )
+
+    @responses.activate
+    @mock.patch('pyramid_heroku.migrate.subprocess')
+    @mock.patch('pyramid_heroku.migrate.print')
+    @mock.patch('pyramid_heroku.migrate.sleep')
+    @mock.patch('pyramid_heroku.migrate.Session')
+    def test_migrate_non_zero(self, ses, sleep, out, sub):
+        h = self.Heroku('test', 'etc/production.ini', 'app:main')
+        p = mock.Mock()
+        p.stdout = b'foo'
+        p.stderr = b'bar'
+        p.check_returncode.side_effect = Exception
+        sub.run.return_value = p
+
+        with pytest.raises(Exception):
+            h.migrate()
+
+        out.assert_has_calls(
+            [call('foo'), call('bar', file=mock.ANY)], any_order=True)

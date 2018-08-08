@@ -87,7 +87,12 @@ class Heroku(object):
         :param cmd: shell command to run
         :return: stdout of command
         """
-        return subprocess.check_output(shlex.split(cmd)).decode()
+
+        p = subprocess.run(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(p.stdout.decode())
+        print(p.stderr.decode(), file=sys.stderr)
+        p.check_returncode()
+        return p.stdout.decode()
 
     def needs_migrate(self):
         """
@@ -97,16 +102,13 @@ class Heroku(object):
         """
         cmd = self.shell(f'alembic -c {self.ini_file}'
                          f' -n {self.app_section} current')
-        print(cmd)
         return 'head' not in cmd
 
     def alembic(self):
         """
         Run alembic migrations.
-
-        :return: alembic stdout
         """
-        return self.shell(f'alembic -c {self.ini_file}'
+        self.shell(f'alembic -c {self.ini_file}'
                           f' -n {self.app_section} upgrade head')
 
     def set_maintenance(self, state):
@@ -141,7 +143,7 @@ class Heroku(object):
             self.set_maintenance(True)
             self.scale_down()
             sleep(30)
-            print(self.alembic())
+            self.alembic()
             self.scale_up()
             sleep(30)
             self.set_maintenance(False)
