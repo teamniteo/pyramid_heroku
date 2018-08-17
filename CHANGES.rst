@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.3.2
+-----
+
+ * Shell now prints stderr/stdout even on non-zero exit code.
+   [iElectric]
+
+
 0.3.1
 -----
 
