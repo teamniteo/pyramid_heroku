@@ -14,6 +14,7 @@ coverage = "*"
 pytest = "*"
 docutils = "*"
 black = "==18.9b0"
+structlog = "*"
 
 [requires]
 python_version = "3.7"
