@@ -111,6 +111,14 @@ class TestHerokuMigrate(unittest.TestCase):
         h.set_maintenance(False)
         out.assert_has_calls([call("Maintenance disabled")])
 
+    @mock.patch("pyramid_heroku.migrate.print")
+    @mock.patch("pyramid_heroku.migrate.Heroku.parse_response", return_value=False)
+    def test_set_maintanence_fail(self, pr, out):
+        """Test that set_maintenance() doesn't print the maintenance state if the call to it failed."""
+        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h.set_maintenance(True)
+        out.assert_not_called()
+
     @mock.patch("pyramid_heroku.migrate.subprocess")
     @responses.activate
     def test_needs_migrate(self, sub):
