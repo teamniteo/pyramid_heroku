@@ -15,4 +15,3 @@ script:
  - pipenv run coverage run --branch --source pyramid_heroku -m pytest pyramid_heroku
  - pipenv run coverage html
  - pipenv run coverage report --fail-under=100
- - pipenv run black pyramid_heroku/
