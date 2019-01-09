@@ -12,7 +12,7 @@ import sys
 
 class Heroku(object):
 
-    api_endpoint = 'https://api.heroku.com'
+    api_endpoint = "https://api.heroku.com"
 
     def __init__(self, app_name, ini_file, app_section):
         # type: (str, str)-> ()
@@ -26,9 +26,9 @@ class Heroku(object):
         self.app_section = app_section
 
         headers = {
-            'Authorization': f'Bearer {self.auth_key}',
-            'Accept': 'application/vnd.heroku+json; version=3',
-            'Content-Type': 'application/json',
+            "Authorization": f"Bearer {self.auth_key}",
+            "Accept": "application/vnd.heroku+json; version=3",
+            "Content-Type": "application/json",
         }
         self.session = Session()
         self.session.headers.update(headers)
@@ -40,17 +40,17 @@ class Heroku(object):
 
         https://devcenter.heroku.com/articles/platform-api-quickstart#authentication.
         """
-        return os.environ.get('MIGRATE_API_SECRET_HEROKU')
+        return os.environ.get("MIGRATE_API_SECRET_HEROKU")
 
     def scale_down(self):
         """Scale all app workers to 0."""
         updates = [dict(type=t, quantity=0) for t in self.formation.keys()]
         res = self.session.patch(
-            f'{self.api_endpoint}/apps/{self.app_name}/formation',
+            f"{self.api_endpoint}/apps/{self.app_name}/formation",
             json=dict(updates=updates),
         )
         self.parse_response(res)
-        print('Scaled down to:')
+        print("Scaled down to:")
         for x in res.json():
             print(f'{x["type"]}={x["quantity"]}')
 
@@ -58,11 +58,11 @@ class Heroku(object):
         """Scale app back to initial state."""
         updates = [dict(type=t, quantity=s) for t, s in self.formation.items()]
         res = self.session.patch(
-            f'{self.api_endpoint}/apps/{self.app_name}/formation',
+            f"{self.api_endpoint}/apps/{self.app_name}/formation",
             json=dict(updates=updates),
         )
         self.parse_response(res)
-        print('Scaled up to:')
+        print("Scaled up to:")
         for x in res.json():
             print(f'{x["type"]}={x["quantity"]}')
 
@@ -74,9 +74,10 @@ class Heroku(object):
         """
         if not self._formation:
             res = self.session.get(
-                f'{self.api_endpoint}/apps/{self.app_name}/formation')
+                f"{self.api_endpoint}/apps/{self.app_name}/formation"
+            )
             self.parse_response(res)
-            self._formation = {x['type']: x['quantity'] for x in res.json()}
+            self._formation = {x["type"]: x["quantity"] for x in res.json()}
         return self._formation
 
     def shell(self, cmd):
@@ -88,7 +89,9 @@ class Heroku(object):
         :return: stdout of command
         """
 
-        p = subprocess.run(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.run(
+            shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         print(p.stdout.decode())
         print(p.stderr.decode(), file=sys.stderr)
         p.check_returncode()
@@ -100,25 +103,24 @@ class Heroku(object):
 
         :return: True if current alembic branch is not up to date.
         """
-        cmd = self.shell(f'alembic -c {self.ini_file}'
-                         f' -n {self.app_section} current')
-        return 'head' not in cmd
+        cmd = self.shell(
+            f"alembic -c {self.ini_file}" f" -n {self.app_section} current"
+        )
+        return "head" not in cmd
 
     def alembic(self):
         """
         Run alembic migrations.
         """
-        self.shell(f'alembic -c {self.ini_file}'
-                          f' -n {self.app_section} upgrade head')
+        self.shell(f"alembic -c {self.ini_file}" f" -n {self.app_section} upgrade head")
 
     def set_maintenance(self, state):
         # type: (bool) -> ()
         res = self.session.patch(
-            f'{self.api_endpoint}/apps/{self.app_name}',
-            json=dict(maintenance=state),
+            f"{self.api_endpoint}/apps/{self.app_name}", json=dict(maintenance=state)
         )
         if self.parse_response(res):
-            print('Maintenance {}'.format('enabled' if state else 'disabled'))
+            print("Maintenance {}".format("enabled" if state else "disabled"))
 
     def parse_response(self, res):
         # type: (requests.Response) -> bool
@@ -148,32 +150,35 @@ class Heroku(object):
             sleep(30)
             self.set_maintenance(False)
         else:
-            print('Database migration is not needed')
+            print("Database migration is not needed")
 
 
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         usage=(
-            'usage: migrate.py [-h] app_name [ini_file] [app_section]'
-            '\nexample: python -m pyramid_heroku.migrate my_app etc/production.ini app:main'),
+            "usage: migrate.py [-h] app_name [ini_file] [app_section]"
+            "\nexample: python -m pyramid_heroku.migrate my_app etc/production.ini app:main"
+        ),
     )
-    parser.add_argument('app_name', help='Heroku app name')
+    parser.add_argument("app_name", help="Heroku app name")
     parser.add_argument(
-        'ini_file',
-        nargs='?',
-        default='etc/production.ini',
-        help='Path to Pyramid configuration file ')
+        "ini_file",
+        nargs="?",
+        default="etc/production.ini",
+        help="Path to Pyramid configuration file ",
+    )
     parser.add_argument(
-        'app_section',
-        nargs='?',
-        default='app:main',
-        help='App section name in ini configuration file')
+        "app_section",
+        nargs="?",
+        default="app:main",
+        help="App section name in ini configuration file",
+    )
 
     options = parser.parse_args()
 
     Heroku(options.app_name, options.ini_file, options.app_section).migrate()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
