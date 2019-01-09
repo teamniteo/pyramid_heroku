@@ -41,6 +41,20 @@ class TestHerokuMigrate(unittest.TestCase):
 
     @mock.patch("pyramid_heroku.migrate.print")
     @responses.activate
+    def test_default_formation(self, out):
+        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h._formation = {"type": "web", "quantity" : 8999}
+        responses.add(
+            responses.PATCH,
+            "https://api.heroku.com/apps/test/formation",  # noqa
+            status=200,
+            json=[{"type": "web", "quantity" : 9001}],
+        )
+        h.scale_up()
+        out.assert_has_calls([call("Scaled up to:"), call("web=9001")])
+
+    @mock.patch("pyramid_heroku.migrate.print")
+    @responses.activate
     def test_scale_down(self, out):
         h = self.Heroku("test", "etc/production.ini", "app:main")
         responses.add(
@@ -96,6 +110,14 @@ class TestHerokuMigrate(unittest.TestCase):
         )
         h.set_maintenance(False)
         out.assert_has_calls([call("Maintenance disabled")])
+
+    @mock.patch("pyramid_heroku.migrate.print")
+    @mock.patch("pyramid_heroku.migrate.Heroku.parse_response", return_value=False)
+    def test_set_maintanence_fail(self, pr, out):
+        """Test that set_maintenance() doesn't print the maintenance state if the call to it failed."""
+        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h.set_maintenance(True)
+        out.assert_not_called()
 
     @mock.patch("pyramid_heroku.migrate.subprocess")
     @responses.activate

@@ -35,6 +35,7 @@ def test_safe_eval():
     assert safe_eval("[]") == []
     with pytest.raises(ValueError):
         assert safe_eval(None) == []
+    with pytest.raises(ValueError):
         assert safe_eval([1, 2, 3]) == []
 
 
