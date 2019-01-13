@@ -1,7 +1,8 @@
 """Set client_add IP that we can trust."""
 
+
 def includeme(config):
-    config.add_tween('pyramid_heroku.client_addr.ClientAddr')
+    config.add_tween("pyramid_heroku.client_addr.ClientAddr")
 
 
 class ClientAddr(object):
@@ -32,7 +33,8 @@ class ClientAddr(object):
         self.registry = registry
 
     def __call__(self, request):
-        if request.headers.get('X-Forwarded-For'):
-            request.headers['X-Forwarded-For'] = \
-                request.headers['X-Forwarded-For'].split(',')[-1].strip()
+        if request.headers.get("X-Forwarded-For"):
+            request.headers["X-Forwarded-For"] = (
+                request.headers["X-Forwarded-For"].split(",")[-1].strip()
+            )
         return self.handler(request)
