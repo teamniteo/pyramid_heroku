@@ -1,8 +1,8 @@
 """Various utilities."""
 
 from ast import literal_eval
+from expandvars import expandvars
 
-import os
 import sys
 import typing as t
 
@@ -18,11 +18,11 @@ def safe_eval(text: str) -> str:
     if not isinstance(text, str):
         raise ValueError(f"Expected a string, got {type(text)} instead.")
 
+    if len(text) == 0:
+        return None
+
     try:
-        if len(text) == 0:
-            return None
-        else:
-            return literal_eval(text[0].upper() + text[1:])
+        return literal_eval(text[0].upper() + text[1:])
     except (ValueError, SyntaxError):
         return text
 
@@ -36,10 +36,12 @@ def expandvars_dict(settings: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
     $ export BAR='${FOO}bar'
     $ python
     >>> from pyramid_heroku import expandvars_dict
-    >>> expandvars_dict({'my_var': '${BAR}'})
-    {'my_var': 'foobar'}
+    >>> expandvars_dict(
+    ...     {'my_var': '${FOO}bar', 'your_var': '${BAR}', 'bool_var': 'true'}
+    ... )
+    {'my_var': 'foobar', 'your_var': 'foobar', 'bool_var': True}
     """
     return {
-        key: safe_eval(os.path.expandvars(os.path.expandvars(value)))
+        key: safe_eval(expandvars(expandvars(value)))
         for (key, value) in settings.items()
     }

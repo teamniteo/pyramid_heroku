@@ -8,14 +8,23 @@ changes = open(os.path.join(here, 'CHANGES.rst')).read()
 
 
 requires = [
+    'expandvars',
     'pyramid>=1.7',
     'requests',
+]
+
+development_require = [
+    'mock',
+    'pytest',
+    'responses',
+    'structlog',
+    'zope.testing',
 ]
 
 
 setup(
     name='pyramid_heroku',
-    version='0.3.2',
+    version='0.3.3',
     description='A bunch of helpers for successfully running Pyramid on Heroku.',
     long_description=readme + '\n' + changes,
     classifiers=[
@@ -33,6 +42,9 @@ setup(
         ],
     packages=['pyramid_heroku'],
     install_requires=requires,
+    extras_require={
+        'develop': development_require,
+    },
     author='Niteo',
     author_email='info@niteo.co',
     license='BSD',
