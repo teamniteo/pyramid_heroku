@@ -1,8 +1,8 @@
 """Various utilities."""
 
 from ast import literal_eval
+from expandvars import expandvars
 
-import os
 import sys
 import typing as t
 
@@ -18,28 +18,23 @@ def safe_eval(text: str) -> str:
     if not isinstance(text, str):
         raise ValueError(f"Expected a string, got {type(text)} instead.")
 
+    if len(text) == 0:
+        return None
+
     try:
-        if len(text) == 0:
-            return None
-        else:
-            return literal_eval(text[0].upper() + text[1:])
+        return literal_eval(text[0].upper() + text[1:])
     except (ValueError, SyntaxError):
         return text
 
 
-def expandvars_dict(settings: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
-    """Expand all environment variables in a settings dictionary.
+def expandvars_dict(settings: t.Dict[str, str]) -> t.Dict[str, t.Any]:
+    """Expand strings or variables from the environment into equivalent python literals or strings.
 
-    Env vars are expanded twice, so you can have (1-level) nesting. Example:
-
-    $ export FOO='foo'
-    $ export BAR='${FOO}bar'
-    $ python
-    >>> from pyramid_heroku import expandvars_dict
-    >>> expandvars_dict({'my_var': '${BAR}'})
-    {'my_var': 'foobar'}
+    >>> expandvars_dict({
+    ...     "really": "true",
+    ...     "count": "1",
+    ...     "url": "http://${HOST:-localhost}:${PORT:-8080}"
+    ... })
+    {'really': True, 'count': 1, 'url': 'http://localhost:8080'}
     """
-    return {
-        key: safe_eval(os.path.expandvars(os.path.expandvars(value)))
-        for (key, value) in settings.items()
-    }
+    return {k: safe_eval(expandvars(v)) for k, v in settings.items()}
