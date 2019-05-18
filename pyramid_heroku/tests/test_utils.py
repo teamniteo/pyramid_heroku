@@ -45,7 +45,7 @@ def test_expandvars_dict():
     import os
 
     os.environ["FOO"] = "foo"
-    os.environ["BAR"] = "${FOO}bar"
+    os.environ["BAR"] = "bar"
     settings = {
         "test_boolean": "true",
         "test_integer": "1337",
@@ -55,7 +55,16 @@ def test_expandvars_dict():
         "test_multi_set": "(('fOo', 'BaRrAr'), ('asd', 'AsD'))",
         "test_empty": "",
         "test_env": "${FOO}",
-        "test_env_nested": "${BAR}",
+        "test_dollar": "$",
+        "test_endswith_dollar": "BAR$",
+        "test_simple_variable": "$FOO",
+        "test_multi_variables": "$FOO${BAR}",
+        "test_default_set": "${FOO:-default}",
+        "test_default_unset": "${BUZ:-default}",
+        "test_substitute_set": "${FOO:+default}",
+        "test_substitute_unset": "${BUZ:+default}",
+        "test_offset": "${BAR:2}",
+        "test_offset_length": "${BAR:1:3}",
     }
 
     expanded_settings = {
@@ -67,7 +76,16 @@ def test_expandvars_dict():
         "test_multi_set": (("fOo", "BaRrAr"), ("asd", "AsD")),
         "test_empty": None,
         "test_env": "foo",
-        "test_env_nested": "foobar",
+        "test_dollar": "$",
+        "test_endswith_dollar": "BAR$",
+        "test_simple_variable": "foo",
+        "test_multi_variables": "foobar",
+        "test_default_set": "foo",
+        "test_default_unset": "default",
+        "test_substitute_set": "default",
+        "test_substitute_unset": None,
+        "test_offset": "r",
+        "test_offset_length": "ar",
     }
 
     assert expanded_settings == expandvars_dict(settings)
