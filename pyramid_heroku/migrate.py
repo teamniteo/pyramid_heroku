@@ -15,9 +15,10 @@ class Heroku(object):
     api_endpoint = "https://api.heroku.com"
 
     def __init__(self, app_name, ini_file, app_section):
-        # type: (str, str)-> ()
+        # type: (str, str, str)-> None
         """
         :param app_name: Name of Heroku app or id.
+        :param ini_file: INI file.
         :param app_section: Config section of app that needs migration.
         """
         self._formation = None
