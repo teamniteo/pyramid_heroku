@@ -4,7 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyramid-heroku = {editable = true, path = "."}
+pyramid-heroku = {editable = true,path = "."}
+mypy = "*"
 
 [dev-packages]
 mock = "*"
@@ -15,6 +16,7 @@ pytest = "*"
 docutils = "*"
 structlog = "*"
 black = "==18.9b0"
+mypy = "*"
 
 [requires]
 python_version = "3.7"
