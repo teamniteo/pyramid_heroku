@@ -1,7 +1,8 @@
 """Graceful DB migrations."""
 
-from requests import Session
+from requests import Session, Response
 from time import sleep
+from typing import Optional
 
 import argparse
 import os
@@ -14,10 +15,10 @@ class Heroku(object):
 
     api_endpoint = "https://api.heroku.com"
 
-    def __init__(self, app_name, ini_file, app_section):
-        # type: (str, str)-> ()
+    def __init__(self, app_name: str, ini_file: str, app_section: str) -> None:
         """
         :param app_name: Name of Heroku app or id.
+        :param ini_file: INI file.
         :param app_section: Config section of app that needs migration.
         """
         self._formation = None
@@ -34,8 +35,7 @@ class Heroku(object):
         self.session.headers.update(headers)
 
     @property
-    def auth_key(self):
-        # type: () -> str
+    def auth_key(self) -> Optional[str]:
         """Heroku API secret.
 
         https://devcenter.heroku.com/articles/platform-api-quickstart#authentication.
@@ -80,8 +80,7 @@ class Heroku(object):
             self._formation = {x["type"]: x["quantity"] for x in res.json()}
         return self._formation
 
-    def shell(self, cmd):
-        # type: (str) -> str
+    def shell(self, cmd: str) -> str:
         """
         Run shell command.
 
@@ -114,16 +113,14 @@ class Heroku(object):
         """
         self.shell(f"alembic -c {self.ini_file}" f" -n {self.app_section} upgrade head")
 
-    def set_maintenance(self, state):
-        # type: (bool) -> ()
+    def set_maintenance(self, state: bool) -> None:
         res = self.session.patch(
             f"{self.api_endpoint}/apps/{self.app_name}", json=dict(maintenance=state)
         )
         if self.parse_response(res):
             print("Maintenance {}".format("enabled" if state else "disabled"))
 
-    def parse_response(self, res):
-        # type: (requests.Response) -> bool
+    def parse_response(self, res: Response) -> Optional[bool]:
         """
         Parses Heroku API response.
 
