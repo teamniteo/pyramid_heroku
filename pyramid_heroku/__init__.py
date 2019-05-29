@@ -7,7 +7,7 @@ import sys
 import typing as t
 
 
-def safe_eval(text: str) -> str:
+def safe_eval(text: str) -> t.Optional[str]:
     """Safely evaluate `text` argument.
 
     `text` can be evaluated to string, number,

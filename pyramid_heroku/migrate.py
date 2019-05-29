@@ -1,7 +1,8 @@
 """Graceful DB migrations."""
 
-from requests import Session
+from requests import Session, Response
 from time import sleep
+from typing import Optional
 
 import argparse
 import os
@@ -36,7 +37,7 @@ class Heroku(object):
 
     @property
     def auth_key(self):
-        # type: () -> str
+        # type: () -> Optional[str]
         """Heroku API secret.
 
         https://devcenter.heroku.com/articles/platform-api-quickstart#authentication.
@@ -116,7 +117,7 @@ class Heroku(object):
         self.shell(f"alembic -c {self.ini_file}" f" -n {self.app_section} upgrade head")
 
     def set_maintenance(self, state):
-        # type: (bool) -> ()
+        # type: (bool) -> None
         res = self.session.patch(
             f"{self.api_endpoint}/apps/{self.app_name}", json=dict(maintenance=state)
         )
@@ -124,7 +125,7 @@ class Heroku(object):
             print("Maintenance {}".format("enabled" if state else "disabled"))
 
     def parse_response(self, res):
-        # type: (requests.Response) -> bool
+        # type: (Response) -> bool
         """
         Parses Heroku API response.
 
