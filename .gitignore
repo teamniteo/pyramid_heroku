@@ -29,3 +29,6 @@ coverage.xml
 .pytest_cache/
 htmlcov/
 .venv/
+
+#Editors & IDEs
+.vscode/

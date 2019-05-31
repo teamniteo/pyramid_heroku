@@ -2,6 +2,14 @@
 Changes
 =======
 
+0.4.0
+-----
+
+ * Supports bash style environment variable expansion.
+   e.g. to declare default value, use `${DATABASE_URL:-sqlite:///database.db}`
+   [sayanarijit]
+
+
 0.3.2
 -----
 
