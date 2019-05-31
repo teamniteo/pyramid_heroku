@@ -4,11 +4,11 @@ Changes
 
 0.4.0
 -----
- 
- * Breaking change: `expandvars_dict` drops support for multilevel variable expansion introduced in 0.2.
-   Use the variables in a single definition instead. e.g. `http://${HOST}:${PORT}`.
+
  * Supports bash style environment variable expansion.
    e.g. to declare default value, use `${DATABASE_URL:-sqlite:///database.db}`
+   [sayanarijit]
+
 
 0.3.2
 -----

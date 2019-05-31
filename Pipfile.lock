@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "23d187b5e5a091164aaf6d5a3085ad7fbbb877fe791079628e65041ffbd3c0cc"
+            "sha256": "1b6ac89ce7ebbc7c3032c33e60eb54b7014cdfaccd79bede92457df134ea1281"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,12 +32,11 @@
         },
         "expandvars": {
             "hashes": [
-                "sha256:2c711ce003bc755a3e58ff36901592a675654be94eeb721c625a0e37d4c3e790",
-                "sha256:68efc0b8096ffae7b9ff3670f153fd9f09c65ebffd0078a8be73b136efff6912",
-                "sha256:e9efc28b45f2027a78c616d04e82692333851aeaecac1a2337560c1214c66c86"
+                "sha256:d8a706c5b967588b35b1ac306ab3789e75d0281833c8334bd50feb284b4af8a8",
+                "sha256:e470d2ba3958c9215186f587dd841feb7ce3d493c93c3cb193698ddc0eb64b3f"
             ],
             "index": "pypi",
-            "version": "==0.2"
+            "version": "==0.3"
         },
         "hupper": {
             "hashes": [
@@ -101,10 +100,10 @@
         },
         "urllib3": {
             "hashes": [
-                "sha256:a53063d8b9210a7bdec15e7b272776b9d42b2fd6816401a0d43006ad2f9902db",
-                "sha256:d363e3607d8de0c220d31950a8f38b18d5ba7c0830facd71a1c6b1036b7ce06c"
+                "sha256:b246607a25ac80bedac05c6f282e3cdaf3afb65420fd024ac94435cabe6e18d1",
+                "sha256:dbe59173209418ae49d485b87d1681aefa36252ee85884c31346debd19463232"
             ],
-            "version": "==1.25.2"
+            "version": "==1.25.3"
         },
         "venusian": {
             "hashes": [
@@ -268,10 +267,10 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:027cfc6524613de726789072f95d2e4cc64dd1dee8096d42d13f2ead5bd302f5",
-                "sha256:0d05199e1f0b1a8707a1b9c46476d4a49807fb56cb1b0737db1d37feb42fe31d"
+                "sha256:a9f185022cfa69e9ca5f7eabfd5a58b689894cb78a11e3c8c89398a8ccbb8e7f",
+                "sha256:df1403cd3aebeb2b1dcd3515ca062eecb5bd3ea7611f18cba81130c68707e879"
             ],
-            "version": "==0.15"
+            "version": "==0.17"
         },
         "mock": {
             "hashes": [
@@ -398,10 +397,10 @@
         },
         "urllib3": {
             "hashes": [
-                "sha256:a53063d8b9210a7bdec15e7b272776b9d42b2fd6816401a0d43006ad2f9902db",
-                "sha256:d363e3607d8de0c220d31950a8f38b18d5ba7c0830facd71a1c6b1036b7ce06c"
+                "sha256:b246607a25ac80bedac05c6f282e3cdaf3afb65420fd024ac94435cabe6e18d1",
+                "sha256:dbe59173209418ae49d485b87d1681aefa36252ee85884c31346debd19463232"
             ],
-            "version": "==1.25.2"
+            "version": "==1.25.3"
         },
         "wcwidth": {
             "hashes": [
@@ -409,6 +408,13 @@
                 "sha256:f4ebe71925af7b40a864553f761ed559b43544f8f71746c2d756c7fe788ade7c"
             ],
             "version": "==0.1.7"
+        },
+        "zipp": {
+            "hashes": [
+                "sha256:8c1019c6aad13642199fbe458275ad6a84907634cc9f0989877ccc4a2840139d",
+                "sha256:ca943a7e809cc12257001ccfb99e3563da9af99d52f261725e96dfe0f9275bc3"
+            ],
+            "version": "==0.5.1"
         },
         "zope.testing": {
             "hashes": [

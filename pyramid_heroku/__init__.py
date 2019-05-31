@@ -30,11 +30,32 @@ def safe_eval(text: str) -> t.Optional[str]:
 def expandvars_dict(settings: t.Dict[str, str]) -> t.Dict[str, t.Any]:
     """Expand strings or variables from the environment into equivalent python literals or strings.
 
-    >>> expandvars_dict({
-    ...     "really": "true",
-    ...     "count": "1",
-    ...     "url": "http://${HOST:-localhost}:${PORT:-8080}"
-    ... })
-    {'really': True, 'count': 1, 'url': 'http://localhost:8080'}
+    >>> from pyramid_heroku import expandvars_dict
+    >>> from pprint import pprint
+    >>> from unittest import mock
+    >>> import os
+    >>> with mock.patch.dict(os.environ,{'STRING':'text', 'BOOL': 'true', 'INT':'1', 'NESTED':'nested_${STRING}'}):
+    ...    pprint(expandvars_dict({
+    ...        "string": "foo",
+    ...        "bool": "true",
+    ...        "int": "1",
+    ...        "default_string": "${FOO:-bar}",
+    ...        "default_int": "${FOO:-2}",
+    ...        "default_bool": "${FOO:-false}",
+    ...        "env_string": "${STRING:-foo}",
+    ...        "env_int": "${INT:-foo}",
+    ...        "env_bool": "${BOOL:-foo}",
+    ...        "nested": "${NESTED:-foo}",
+    ...    }))
+    {'bool': True,
+     'default_bool': False,
+     'default_int': 2,
+     'default_string': 'bar',
+     'env_bool': True,
+     'env_int': 1,
+     'env_string': 'text',
+     'int': 1,
+     'nested': 'nested_text',
+     'string': 'foo'}
     """
-    return {k: safe_eval(expandvars(v)) for k, v in settings.items()}
+    return {k: safe_eval(expandvars(expandvars(v))) for k, v in settings.items()}

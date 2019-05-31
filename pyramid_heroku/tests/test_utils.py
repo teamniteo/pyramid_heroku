@@ -46,6 +46,7 @@ def test_expandvars_dict():
 
     os.environ["FOO"] = "foo"
     os.environ["BAR"] = "bar"
+    os.environ["NESTED"] = "${FOO}bar"
     settings = {
         "test_boolean": "true",
         "test_integer": "1337",
@@ -55,6 +56,7 @@ def test_expandvars_dict():
         "test_multi_set": "(('fOo', 'BaRrAr'), ('asd', 'AsD'))",
         "test_empty": "",
         "test_env": "${FOO}",
+        "test_env_nested": "${NESTED}",
         "test_dollar": "$",
         "test_endswith_dollar": "BAR$",
         "test_simple_variable": "$FOO",
@@ -76,6 +78,7 @@ def test_expandvars_dict():
         "test_multi_set": (("fOo", "BaRrAr"), ("asd", "AsD")),
         "test_empty": None,
         "test_env": "foo",
+        "test_env_nested": "foobar",
         "test_dollar": "$",
         "test_endswith_dollar": "BAR$",
         "test_simple_variable": "foo",
