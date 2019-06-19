@@ -1,10 +1,10 @@
 """Various utilities."""
 
-from ast import literal_eval
-from expandvars import expandvars
-
 import sys
 import typing as t
+from ast import literal_eval
+
+from expandvars import expandvars
 
 
 def safe_eval(text: str) -> t.Optional[str]:
@@ -19,7 +19,7 @@ def safe_eval(text: str) -> t.Optional[str]:
         raise ValueError(f"Expected a string, got {type(text)} instead.")
 
     if len(text) == 0:
-        return None
+        return text
 
     try:
         return literal_eval(text[0].upper() + text[1:])
@@ -36,16 +36,17 @@ def expandvars_dict(settings: t.Dict[str, str]) -> t.Dict[str, t.Any]:
     >>> import os
     >>> with mock.patch.dict(os.environ,{'STRING':'text', 'BOOL': 'true', 'INT':'1', 'NESTED':'nested_${STRING}'}):
     ...    pprint(expandvars_dict({
-    ...        "string": "foo",
     ...        "bool": "true",
-    ...        "int": "1",
-    ...        "default_string": "${FOO:-bar}",
-    ...        "default_int": "${FOO:-2}",
     ...        "default_bool": "${FOO:-false}",
-    ...        "env_string": "${STRING:-foo}",
-    ...        "env_int": "${INT:-foo}",
+    ...        "default_int": "${FOO:-2}",
+    ...        "default_string": "${FOO:-bar}",
     ...        "env_bool": "${BOOL:-foo}",
+    ...        "env_int": "${INT:-foo}",
+    ...        "env_string": "${STRING:-foo}",
+    ...        "int": "1",
+    ...        "must_be_set": "${STRING:? error: STRING must be set!}",
     ...        "nested": "${NESTED:-foo}",
+    ...        "string": "foo",
     ...    }))
     {'bool': True,
      'default_bool': False,
@@ -55,6 +56,7 @@ def expandvars_dict(settings: t.Dict[str, str]) -> t.Dict[str, t.Any]:
      'env_int': 1,
      'env_string': 'text',
      'int': 1,
+     'must_be_set': 'text',
      'nested': 'nested_text',
      'string': 'foo'}
     """

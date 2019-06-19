@@ -31,7 +31,7 @@ def test_safe_eval():
         ("asd", "AsD"),
     )
 
-    assert safe_eval("") is None
+    assert safe_eval("") == ""
     assert safe_eval("[]") == []
     with pytest.raises(ValueError):
         assert safe_eval(None) == []
@@ -76,7 +76,7 @@ def test_expandvars_dict():
         "test_none": None,
         "test_set": ("test", "tIsT"),
         "test_multi_set": (("fOo", "BaRrAr"), ("asd", "AsD")),
-        "test_empty": None,
+        "test_empty": "",
         "test_env": "foo",
         "test_env_nested": "foobar",
         "test_dollar": "$",
@@ -86,7 +86,7 @@ def test_expandvars_dict():
         "test_default_set": "foo",
         "test_default_unset": "default",
         "test_substitute_set": "default",
-        "test_substitute_unset": None,
+        "test_substitute_unset": "",
         "test_offset": "r",
         "test_offset_length": "ar",
     }
