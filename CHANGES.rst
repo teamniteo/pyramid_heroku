@@ -2,6 +2,15 @@
 Changes
 =======
 
+0.5.0
+-----
+ * Prefer empty string than None. `{'VAL': '${VAR}'}` will expand into
+   `{'VAL': ''}` instead of `{'VAL': None}` if the value of `VAR` is not exported or
+   is an empty string.
+   [sayanarijit]
+ * To enforce that `$VAR` must be set, `${VAR:?custom error message}` syntax can be used.
+   [sayanarijit]
+
 0.4.0
 -----
 
