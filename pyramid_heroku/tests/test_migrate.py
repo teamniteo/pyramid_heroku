@@ -25,24 +25,17 @@ class TestHerokuMigrate(unittest.TestCase):
             heroku.assert_called_with(*called_with)
 
         # all default
-        assert_args(["my_test_app"], ["my_test_app", "etc/production.ini", "app:main"])
-
-        # only app_section default
-        assert_args(
-            ["my_test_app", "etc/develop.ini"],
-            ["my_test_app", "etc/develop.ini", "app:main"],
-        )
+        assert_args(["my_test_app"], ["my_test_app", "etc/production.ini"])
 
         # all custom
         assert_args(
-            ["my_test_app", "etc/develop2.ini", "app:main2"],
-            ["my_test_app", "etc/develop2.ini", "app:main2"],
+            ["my_test_app", "etc/develop2.ini"], ["my_test_app", "etc/develop2.ini"]
         )
 
     @mock.patch("pyramid_heroku.migrate.print")
     @responses.activate
     def test_default_formation(self, out):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         h._formation = {"type": "web", "quantity": 8999}
         responses.add(
             responses.PATCH,
@@ -56,7 +49,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.print")
     @responses.activate
     def test_scale_down(self, out):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         responses.add(
             responses.GET,
             "https://api.heroku.com/apps/test/formation",  # noqa
@@ -75,7 +68,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.print")
     @responses.activate
     def test_scale_up(self, out):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         responses.add(
             responses.GET,
             "https://api.heroku.com/apps/test/formation",  # noqa
@@ -94,7 +87,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.print")
     @responses.activate
     def test_maintenance_on(self, out):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         responses.add(
             responses.PATCH, "https://api.heroku.com/apps/test", status=200  # noqa
         )
@@ -104,7 +97,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.print")
     @responses.activate
     def test_maintenance_off(self, out):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         responses.add(
             responses.PATCH, "https://api.heroku.com/apps/test", status=200  # noqa
         )
@@ -115,18 +108,25 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.Heroku.parse_response", return_value=False)
     def test_set_maintanence_fail(self, pr, out):
         """Test that set_maintenance() doesn't print the maintenance state if the call to it failed."""
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         h.set_maintenance(True)
         out.assert_not_called()
 
     @mock.patch("pyramid_heroku.migrate.subprocess")
     @responses.activate
     def test_needs_migrate(self, sub):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         sub.run.stdout.return_value = b""
         self.assertTrue(h.needs_migrate())
         sub.run.assert_called_with(
-            ["alembic", "-c", "etc/production.ini", "-n", "app:main", "current"],
+            [
+                "alembic",
+                "-c",
+                "etc/alembic.ini",
+                "-x",
+                "ini=etc/production.ini",
+                "current",
+            ],
             stdout=mock.ANY,
             stderr=mock.ANY,
         )
@@ -134,13 +134,20 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.subprocess")
     @responses.activate
     def test_does_not_need_migrate(self, sub):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         p = mock.Mock()
         p.stdout = b"head"
         sub.run.return_value = p
         self.assertFalse(h.needs_migrate())
         sub.run.assert_called_with(
-            ["alembic", "-c", "etc/production.ini", "-n", "app:main", "current"],
+            [
+                "alembic",
+                "-c",
+                "etc/alembic.ini",
+                "-x",
+                "ini=etc/production.ini",
+                "current",
+            ],
             stdout=mock.ANY,
             stderr=mock.ANY,
         )
@@ -148,7 +155,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.subprocess")
     @responses.activate
     def test_alembic(self, sub):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         p = mock.Mock()
         p.stdout = b"head"
         sub.run.return_value = p
@@ -158,9 +165,9 @@ class TestHerokuMigrate(unittest.TestCase):
             [
                 "alembic",
                 "-c",
-                "etc/production.ini",
-                "-n",
-                "app:main",
+                "etc/alembic.ini",
+                "-x",
+                "ini=etc/production.ini",
                 "upgrade",
                 "head",
             ],
@@ -173,13 +180,20 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.sleep")
     @responses.activate
     def test_migrate_skip(self, sleep, out, sub):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         p = mock.Mock()
         p.stdout = b"head"
         sub.run.return_value = p
         h.migrate()
         sub.run.assert_called_with(
-            ["alembic", "-c", "etc/production.ini", "-n", "app:main", "current"],
+            [
+                "alembic",
+                "-c",
+                "etc/alembic.ini",
+                "-x",
+                "ini=etc/production.ini",
+                "current",
+            ],
             stdout=mock.ANY,
             stderr=mock.ANY,
         )
@@ -193,15 +207,15 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.Session")
     @responses.activate
     def test_migrate(self, ses, sleep, out, sub):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         h.migrate()
         sub.run.assert_called_with(
             [
                 "alembic",
                 "-c",
-                "etc/production.ini",
-                "-n",
-                "app:main",
+                "etc/alembic.ini",
+                "-x",
+                "ini=etc/production.ini",
                 "upgrade",
                 "head",
             ],
@@ -215,7 +229,7 @@ class TestHerokuMigrate(unittest.TestCase):
     @mock.patch("pyramid_heroku.migrate.Session")
     @responses.activate
     def test_migrate_non_zero(self, ses, sleep, out, sub):
-        h = self.Heroku("test", "etc/production.ini", "app:main")
+        h = self.Heroku("test", "etc/production.ini")
         p = mock.Mock()
         p.stdout = b"foo"
         p.stderr = b"bar"

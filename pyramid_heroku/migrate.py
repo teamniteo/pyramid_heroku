@@ -15,16 +15,14 @@ class Heroku(object):
 
     api_endpoint = "https://api.heroku.com"
 
-    def __init__(self, app_name: str, ini_file: str, app_section: str) -> None:
+    def __init__(self, app_name: str, ini_file: str) -> None:
         """
         :param app_name: Name of Heroku app or id.
-        :param ini_file: INI file.
-        :param app_section: Config section of app that needs migration.
+        :param ini_file: development.ini or production.ini filename.
         """
         self._formation = None
         self.app_name = app_name
         self.ini_file = ini_file
-        self.app_section = app_section
 
         headers = {
             "Authorization": f"Bearer {self.auth_key}",
@@ -102,16 +100,14 @@ class Heroku(object):
 
         :return: True if current alembic branch is not up to date.
         """
-        cmd = self.shell(
-            f"alembic -c {self.ini_file}" f" -n {self.app_section} current"
-        )
+        cmd = self.shell(f"alembic -c etc/alembic.ini -x ini={self.ini_file} current")
         return "head" not in cmd
 
     def alembic(self):
         """
         Run alembic migrations.
         """
-        self.shell(f"alembic -c {self.ini_file}" f" -n {self.app_section} upgrade head")
+        self.shell(f"alembic -c etc/alembic.ini -x ini={self.ini_file} upgrade head")
 
     def set_maintenance(self, state: bool) -> None:
         res = self.session.patch(
@@ -135,7 +131,6 @@ class Heroku(object):
     def migrate(self):
         """Run database migration if needed."""
         print(self.app_name)
-        print(self.app_section)
         print(self.ini_file)
 
         if self.needs_migrate():
@@ -154,8 +149,8 @@ def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         usage=(
-            "usage: migrate.py [-h] app_name [ini_file] [app_section]"
-            "\nexample: python -m pyramid_heroku.migrate my_app etc/production.ini app:main"
+            "usage: migrate.py [-h] [app_name] [ini_file]"
+            "\nexample: python -m pyramid_heroku.migrate my_app etc/production.ini"
         ),
     )
     parser.add_argument("app_name", help="Heroku app name")
@@ -165,16 +160,10 @@ def main():
         default="etc/production.ini",
         help="Path to Pyramid configuration file ",
     )
-    parser.add_argument(
-        "app_section",
-        nargs="?",
-        default="app:main",
-        help="App section name in ini configuration file",
-    )
 
     options = parser.parse_args()
 
-    Heroku(options.app_name, options.ini_file, options.app_section).migrate()
+    Heroku(options.app_name, options.ini_file).migrate()
 
 
 if __name__ == "__main__":

@@ -57,7 +57,7 @@ Usage example for automatic alembic migration script::
     set -e
 
     echo "Running migrations"
-    python -m pyramid_heroku.migrate my_app etc/production.ini app:main
+    python -m pyramid_heroku.migrate my_app etc/production.ini
 
     echo "DONE!"
 
