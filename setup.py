@@ -9,7 +9,7 @@ changes = open(os.path.join(here, "CHANGES.rst")).read()
 
 setup(
     name="pyramid_heroku",
-    version="0.5.0",
+    version="0.6.0",
     description="A bunch of helpers for successfully running Pyramid on Heroku.",
     long_description=readme + "\n" + changes,
     classifiers=[

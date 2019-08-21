@@ -2,12 +2,23 @@
 Changes
 =======
 
+0.6.0
+-----
+
+* Update how alembic should be called in migrate.py. This is to reflect the
+  latest changes to pyramid_deferred_sqla:
+  https://github.com/niteoweb/pyramid_deferred_sqla/commit/b963702cab3934116fb00b6ef186959bc1627026
+  [zupo]
+
+
 0.5.0
 -----
+
  * Prefer empty string than None. `{'VAL': '${VAR}'}` will expand into
    `{'VAL': ''}` instead of `{'VAL': None}` if the value of `VAR` is not exported or
    is an empty string.
    [sayanarijit]
+
  * To enforce that `$VAR` must be set, `${VAR:?custom error message}` syntax can be used.
    [sayanarijit]
 
