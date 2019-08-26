@@ -26,6 +26,7 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     packages=["pyramid_heroku"],
+    include_package_data=True,
     install_requires=["expandvars", "pyramid>=1.7", "requests"],
     author="Niteo",
     author_email="info@niteo.co",
