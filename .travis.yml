@@ -17,4 +17,4 @@ script:
  - pipenv run coverage report --fail-under=100
  - pipenv run black pyramid_heroku/ --check
  - pipenv run mypy pyramid_heroku --ignore-missing-imports  --linecount-report typecov
- - pipenv run python .mypy/type_coverage.py 15 typecov/linecount.txt
+ - pipenv run typecov 15 typecov/linecount.txt
