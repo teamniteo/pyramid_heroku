@@ -7,31 +7,7 @@ from pyramid import testing
 import unittest
 from unittest import mock
 import structlog
-import sys
-
-
-SENTRY_TAGS = {}
-
-class MockScope(object):
-
-    def __init__(self):
-        # reset the tags for every new test
-        SENTRY_TAGS = {}
-
-    def set_tag(self, key, value):
-        SENTRY_TAGS[key] = value
-
-
-class MockSentrySDK:
-    @classmethod
-    def configure_scope(cls):
-        @contextmanager
-        def inner():
-            yield MockScope()
-        return inner()
-
-
-sys.modules['sentry_sdk'] = MockSentrySDK
+import sentry_sdk
 
 
 class TestRequestIDLogger(unittest.TestCase):
@@ -44,16 +20,22 @@ class TestRequestIDLogger(unittest.TestCase):
 
         self.request_id = "some-random-requestid"
 
+        self.some_random_dsn = "https://some@random.dsn/12345"
+
     def tearDown(self):
         testing.tearDown()
 
     def test_request_id_in_sentry(self):
+        sentry_sdk.init(self.some_random_dsn)
         from pyramid_heroku.request_id import RequestIDLogger
 
         self.request.headers["X-Request-ID"] = self.request_id
         RequestIDLogger(self.handler, self.registry)(self.request)
         self.handler.assert_called_with(self.request)
-        self.assertEqual(SENTRY_TAGS, {"request_id": self.request_id})
+        self.assertEqual(
+            sentry_sdk.Hub.current._stack[-1][1]._tags,
+            {"request_id": self.request_id}
+        )
 
     def test_request_id_in_structlog(self):
         structlog.reset_defaults()
@@ -72,11 +54,12 @@ class TestRequestIDLogger(unittest.TestCase):
         )
 
     def test_no_request_id_in_sentry(self):
+        sentry_sdk.init(self.some_random_dsn)
         from pyramid_heroku.request_id import RequestIDLogger
 
         RequestIDLogger(self.handler, self.registry)(self.request)
         self.handler.assert_called_with(self.request)
-        self.assertEqual(SENTRY_TAGS, {})
+        self.assertEqual(sentry_sdk.Hub.current._stack[-1][1]._tags, {})
 
     def test_no_request_id_in_structlog(self):
         structlog.reset_defaults()

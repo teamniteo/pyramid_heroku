@@ -2,7 +2,6 @@
 if structlog is imported.
 """
 
-
 try:
     import sentry_sdk
     IS_SENTRY_ENABLED = True
@@ -42,7 +41,7 @@ class RequestIDLogger(object):
 
             if IS_STRUCTLOG_ENABLED:
                 WrappedDictClass = structlog.threadlocal.wrap_dict(dict)
-                wrapped_request_id = WrappedDictClass({
+                _ = WrappedDictClass({
                     "request_id": request_id
                 })
                 structlog.configure(context_class=WrappedDictClass)
