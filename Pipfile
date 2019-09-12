@@ -18,6 +18,7 @@ structlog = "*"
 black = "==18.9b0"
 mypy = "*"
 typecov = "*"
+sentry-sdk = "*"
 
 [requires]
 python_version = "3.7"
