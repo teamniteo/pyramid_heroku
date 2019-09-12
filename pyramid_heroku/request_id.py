@@ -2,17 +2,22 @@
 if structlog is imported.
 """
 
+IS_SENTRY_INSTALLED: bool
+IS_STRUCTLOG_INSTALLED: bool
+
 try:
     import sentry_sdk
-    IS_SENTRY_ENABLED = True
+
+    IS_SENTRY_INSTALLED = True
 except ImportError:
-    IS_SENTRY_ENABLED = False
+    IS_SENTRY_INSTALLED = False
 
 try:
     import structlog
-    IS_STRUCTLOG_ENABLED = True
+
+    IS_STRUCTLOG_INSTALLED = True
 except ImportError:
-    IS_STRUCTLOG_ENABLED = False
+    IS_STRUCTLOG_INSTALLED = False
 
 
 def includeme(config):
@@ -34,16 +39,22 @@ class RequestIDLogger(object):
     def __call__(self, request):
         request_id = request.headers.get("X-Request-ID")
 
-        if request_id is not None:
-            if IS_SENTRY_ENABLED:
-                with sentry_sdk.configure_scope() as scope:
-                    scope.set_tag("request_id", request_id)
+        if request_id is None:
+            return self.handler(request)
 
-            if IS_STRUCTLOG_ENABLED:
-                WrappedDictClass = structlog.threadlocal.wrap_dict(dict)
-                _ = WrappedDictClass({
-                    "request_id": request_id
-                })
-                structlog.configure(context_class=WrappedDictClass)
+        if IS_SENTRY_INSTALLED:
+            self.set_sentry_scope(request_id)
+
+        if IS_STRUCTLOG_INSTALLED:
+            self.set_structlog_context(request_id)
 
         return self.handler(request)
+
+    def set_sentry_scope(self, request_id: int) -> None:
+        with sentry_sdk.configure_scope() as scope:
+            scope.set_tag("request_id", request_id)
+
+    def set_structlog_context(self, request_id: int) -> None:
+        WrappedDictClass = structlog.threadlocal.wrap_dict(dict)
+        _ = WrappedDictClass({"request_id": request_id})
+        structlog.configure(context_class=WrappedDictClass)
