@@ -8,11 +8,9 @@ pyramid_heroku is a collection of tweens and helpers to successfully run `Pyrami
 
 It provides the following:
 
-* ``ClientAddr`` tween that sets real user's IP to ``request.client_addr``
-* ``HerokuappAccess`` tween that denies access to your app's
-  ``<app>.herokuapp.com`` domain for any non-whitelisted IPs.
-* ``migrate.py`` script for automatically running alembic migrations on
-  deploy.
+* ``ClientAddr`` tween that sets real user's IP to ``request.client_addr``. Without this tween you cannot do IP-based geolocation, IP whitelisting, etc.
+* ``HerokuappAccess`` tween that denies access to your app's ``<app>.herokuapp.com`` domain for any non-whitelisted IPs. This is helpful because you don't want anyone outside your team (i.e. usual visitors/users and search bots) to be able to visit ``<app>.heroku.com`` besides the domain the app is deployed on. This is for security and SEO purposes. 
+* ``migrate.py`` script for automatically running alembic migrations on deploy.
 
 
 Installation
