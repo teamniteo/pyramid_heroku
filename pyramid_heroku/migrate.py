@@ -1,6 +1,7 @@
 """Graceful DB migrations."""
 
-from requests import Session, Response
+from requests import Response
+from requests import Session
 from time import sleep
 from typing import Optional
 

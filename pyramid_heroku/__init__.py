@@ -1,10 +1,10 @@
 """Various utilities."""
 
+from ast import literal_eval
+from expandvars import expandvars
+
 import sys
 import typing as t
-from ast import literal_eval
-
-from expandvars import expandvars
 
 
 def safe_eval(text: str) -> t.Optional[str]:
