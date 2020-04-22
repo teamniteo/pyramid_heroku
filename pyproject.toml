@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "pyramid_heroku"
+version = "0.6.0"
+description = "A bunch of helpers for successfully running Pyramid on Heroku."
+readme = "README.rst"
+include = [ "CHANGES.rst", "COPYING.txt" ]
+classifiers = [
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Framework :: Pylons",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: WSGI",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+packages = [
+    { include = "pyramid_heroku" },
+]
+authors = [ "Niteo <info@niteo.co>" ]
+license = "BSD-3-Clause"
+homepage = "https://github.com/niteoweb/pyramid_heroku"
+keywords = [ "pyramid", "heroku", "pylons", "web" ]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+expandvars = "*"
+requests = "*"
+pyramid = ">=1.7"
+
+[tool.poetry.dev-dependencies]
+black = "==18.9b0"
+docutils = "*"
+mock = "*"
+mypy = "*"
+pytest = "*"
+responses = "*"
+structlog = "*"
+typecov = "*"
+"zope.testing" = "*"
+pytest-cov = "^2.8.1"
+isort = "^4.3.21"
