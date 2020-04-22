@@ -75,9 +75,9 @@ Releasing
 ---------
 
 #. Update CHANGES.rst.
-#. Update setup.py version.
-#. Run ``pipenv run python setup.py check -rs``.
-#. Run ``pipenv run python setup.py sdist upload``.
+#. Update pyproject.toml version.
+#. Run ``poetry check``.
+#. Run ``poetry publish``.
 
 
 We're hiring!

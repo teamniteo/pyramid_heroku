@@ -1,3 +1,0 @@
-include *.txt
-include *.rst
-graft pyramid_heroku
