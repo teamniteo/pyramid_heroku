@@ -1,0 +1,40 @@
+version: 2.1
+
+workflows:
+  version: 2
+
+  Default:
+    jobs:
+      - Install-Lint-Build-Test
+
+executors:
+  python37:
+    docker:
+      - image: circleci/python:3.7
+
+jobs:
+  Install-Lint-Build-Test:
+    executor: python37
+    steps:
+      - checkout
+
+      - run:
+          name: Install
+          command: poetry install
+
+      - run:
+          name: Lint
+          command: |
+            poetry check -n -V
+            poetry run black --diff .
+            poetry run isort --diff --check-only -rc .
+            poetry run mypy . || true
+            poetry run typecov 16 ./typecov/linecount.txt
+
+      - run:
+          name: Build
+          command: poetry build -n -V
+
+      - run:
+          name: Test
+          command: poetry run pytest --cov=pyramid_heroku --cov-fail-under=100

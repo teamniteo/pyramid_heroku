@@ -5,8 +5,8 @@ from zope.testing.loggingsupport import InstalledHandler
 
 import logging
 import mock
-import unittest
 import structlog
+import unittest
 
 tweens_handler = InstalledHandler("pyramid_heroku.herokuapp_access")
 
