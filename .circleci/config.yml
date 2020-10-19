@@ -29,7 +29,7 @@ jobs:
             poetry run black --diff .
             poetry run isort --diff --check-only -rc .
             poetry run mypy . || true
-            poetry run typecov 16 ./typecov/linecount.txt
+            poetry run typecov 15 ./typecov/linecount.txt
 
       - run:
           name: Build

@@ -1,4 +1,4 @@
-"""Set client_add IP that we can trust."""
+"""Set client_addr IP that we can trust."""
 
 
 def includeme(config):

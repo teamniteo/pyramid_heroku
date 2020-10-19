@@ -9,6 +9,7 @@ pyramid_heroku is a collection of tweens and helpers to successfully run `Pyrami
 It provides the following:
 
 * ``ClientAddr`` tween that sets real user's IP to ``request.client_addr``
+* ``Host`` tween that sets `request.host` to proxied `X-Forwarded-Host` header (note: potential security risk)
 * ``HerokuappAccess`` tween that denies access to your app's
   ``<app>.herokuapp.com`` domain for any non-whitelisted IPs.
 * ``migrate.py`` script for automatically running alembic migrations on
