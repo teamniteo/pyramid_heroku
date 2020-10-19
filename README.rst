@@ -78,7 +78,7 @@ Releasing
 #. Update CHANGES.rst.
 #. Update pyproject.toml version.
 #. Run ``poetry check``.
-#. Run ``poetry publish``.
+#. Run ``poetry publish --build``.
 
 
 We're hiring!

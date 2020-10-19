@@ -2,6 +2,14 @@
 Changes
 =======
 
+0.7.0
+-----
+
+ * Add `pyramid_heroku.Host` tween to support AutoIdle add-on. Refs:
+   https://github.com/niteoweb/pyramid-realworld-example-app/issues/127
+   [zupo]
+
+
 0.6.0
 -----
 
@@ -21,6 +29,7 @@ Changes
 
  * To enforce that `$VAR` must be set, `${VAR:?custom error message}` syntax can be used.
    [sayanarijit]
+
 
 0.4.0
 -----
