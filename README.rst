@@ -14,6 +14,7 @@ It provides the following:
   ``<app>.herokuapp.com`` domain for any non-whitelisted IPs.
 * ``migrate.py`` script for automatically running alembic migrations on
   deploy.
+* ``maintenance.py`` script for controlling Heroku maintenance mode.
 
 
 Installation
@@ -46,9 +47,10 @@ Usage example for tweens::
         config.include('pyramid_heroku.herokuapp_access')
         return config.make_wsgi_app()
 
-The `pyramid_heroku.herokuapp_access` tween depends on
-`pyramid_heroku.client_addr` tween and it requires you to list whitelisted IPs
-in the `pyramid_heroku.herokuapp_whitelist` setting.
+The ``pyramid_heroku.herokuapp_access`` tween depends on
+``pyramid_heroku.client_addr`` tween and it requires you to list whitelisted IPs
+in the ``pyramid_heroku.herokuapp_whitelist`` setting.
+
 
 Usage example for automatic alembic migration script::
 
@@ -65,11 +67,25 @@ Usage example for automatic alembic migration script::
 For migration script to work, you need to set the ``MIGRATE_API_SECRET_HEROKU``
 env var in Heroku. This allows the migration script to use the Heroku API.
 
-See tests for more examples.
+
+Before running DB migration, the script will enable `Heroku maintenance mode <https://devcenter.heroku.com/articles/maintenance-mode>`_
+if the app is not already in maintenance mode. After the migration, maintenance mode will
+be disabled only if it was enabled by the migration script.
+
+Maintenance mode can also be enabled/disabled using the ``pyramid_heroku.maintenance`` script.
+
+Usage example for enabling the Heroku maintenance mode::
+
+    python -m pyramid_heroku.maintenance on my_app etc/production.ini
+
 
 If you use structlog, add the following configuration setting to your INI file to enable structlog-like logging::
 
     pyramid_heroku.structlog = true
+
+
+See tests for more examples.
+
 
 
 Releasing

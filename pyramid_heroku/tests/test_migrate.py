@@ -1,8 +1,10 @@
 """Tests for Heroku migrate script."""
 
 from mock import call
+from pyramid_heroku.migrate import alembic
+from pyramid_heroku.migrate import migrate
+from pyramid_heroku.migrate import needs_migrate
 
-import json
 import mock
 import pytest
 import responses
@@ -11,7 +13,7 @@ import unittest
 
 class TestHerokuMigrate(unittest.TestCase):
     def setUp(self):
-        from pyramid_heroku.migrate import Heroku
+        from pyramid_heroku.heroku import Heroku
 
         self.Heroku = Heroku
 
@@ -21,7 +23,7 @@ class TestHerokuMigrate(unittest.TestCase):
         def assert_args(args, called_with):
             with mock.patch("sys.argv", ["migrate.py"] + args), mock.patch(
                 "pyramid_heroku.migrate.Heroku"
-            ) as heroku:
+            ) as heroku, mock.patch("pyramid_heroku.migrate.migrate"):
                 main()
             heroku.assert_called_with(*called_with)
 
@@ -33,103 +35,12 @@ class TestHerokuMigrate(unittest.TestCase):
             ["my_test_app", "etc/develop2.ini"], ["my_test_app", "etc/develop2.ini"]
         )
 
-    @mock.patch("pyramid_heroku.migrate.print")
-    @responses.activate
-    def test_default_formation(self, out):
-        h = self.Heroku("test", "etc/production.ini")
-        h._formation = {"type": "web", "quantity": 8999}
-        responses.add(
-            responses.PATCH,
-            "https://api.heroku.com/apps/test/formation",  # noqa
-            status=200,
-            json=[{"type": "web", "quantity": 9001}],
-        )
-        h.scale_up()
-        out.assert_has_calls([call("Scaled up to:"), call("web=9001")])
-
-    @mock.patch("pyramid_heroku.migrate.print")
-    @responses.activate
-    def test_scale_down(self, out):
-        h = self.Heroku("test", "etc/production.ini")
-        responses.add(
-            responses.GET,
-            "https://api.heroku.com/apps/test/formation",  # noqa
-            status=200,
-            json=[{"type": "web", "quantity": 1}],
-        )
-        responses.add(
-            responses.PATCH,
-            "https://api.heroku.com/apps/test/formation",  # noqa
-            status=200,
-            json=[{"type": "web", "quantity": 0}],
-        )
-        h.scale_down()
-        out.assert_has_calls([call("Scaled down to:"), call("web=0")])
-
-    @mock.patch("pyramid_heroku.migrate.print")
-    @responses.activate
-    def test_scale_up(self, out):
-        h = self.Heroku("test", "etc/production.ini")
-        responses.add(
-            responses.GET,
-            "https://api.heroku.com/apps/test/formation",  # noqa
-            status=200,
-            json=[{"type": "web", "quantity": 1}],
-        )
-        responses.add(
-            responses.PATCH,
-            "https://api.heroku.com/apps/test/formation",  # noqa
-            status=200,
-            json=[{"type": "web", "quantity": 5}],
-        )
-        h.scale_up()
-        out.assert_has_calls([call("Scaled up to:"), call("web=5")])
-
-    @responses.activate
-    def test_get_maintenance(self):
-        h = self.Heroku("test", "etc/production.ini")
-        responses.add(  # noqa
-            responses.GET,
-            "https://api.heroku.com/apps/test",
-            status=200,
-            body=json.dumps({"maintenance": True}),
-        )
-        assert h.get_maintenance()
-
-    @mock.patch("pyramid_heroku.migrate.print")
-    @responses.activate
-    def test_maintenance_on(self, out):
-        h = self.Heroku("test", "etc/production.ini")
-        responses.add(
-            responses.PATCH, "https://api.heroku.com/apps/test", status=200  # noqa
-        )
-        h.set_maintenance(True)
-        out.assert_has_calls([call("Maintenance enabled")])
-
-    @mock.patch("pyramid_heroku.migrate.print")
-    @responses.activate
-    def test_maintenance_off(self, out):
-        h = self.Heroku("test", "etc/production.ini")
-        responses.add(
-            responses.PATCH, "https://api.heroku.com/apps/test", status=200  # noqa
-        )
-        h.set_maintenance(False)
-        out.assert_has_calls([call("Maintenance disabled")])
-
-    @mock.patch("pyramid_heroku.migrate.print")
-    @mock.patch("pyramid_heroku.migrate.Heroku.parse_response", return_value=False)
-    def test_set_maintanence_fail(self, pr, out):
-        """Test that set_maintenance() doesn't print the maintenance state if the call to it failed."""
-        h = self.Heroku("test", "etc/production.ini")
-        h.set_maintenance(True)
-        out.assert_not_called()
-
-    @mock.patch("pyramid_heroku.migrate.subprocess")
+    @mock.patch("pyramid_heroku.subprocess")
     @responses.activate
     def test_needs_migrate(self, sub):
         h = self.Heroku("test", "etc/production.ini")
         sub.run.stdout.return_value = b""
-        self.assertTrue(h.needs_migrate())
+        self.assertTrue(needs_migrate(h))
         sub.run.assert_called_with(
             [
                 "alembic",
@@ -143,14 +54,14 @@ class TestHerokuMigrate(unittest.TestCase):
             stderr=mock.ANY,
         )
 
-    @mock.patch("pyramid_heroku.migrate.subprocess")
+    @mock.patch("pyramid_heroku.subprocess")
     @responses.activate
     def test_does_not_need_migrate(self, sub):
         h = self.Heroku("test", "etc/production.ini")
         p = mock.Mock()
         p.stdout = b"head"
         sub.run.return_value = p
-        self.assertFalse(h.needs_migrate())
+        self.assertFalse(needs_migrate(h))
         sub.run.assert_called_with(
             [
                 "alembic",
@@ -164,14 +75,14 @@ class TestHerokuMigrate(unittest.TestCase):
             stderr=mock.ANY,
         )
 
-    @mock.patch("pyramid_heroku.migrate.subprocess")
+    @mock.patch("pyramid_heroku.subprocess")
     @responses.activate
     def test_alembic(self, sub):
         h = self.Heroku("test", "etc/production.ini")
         p = mock.Mock()
         p.stdout = b"head"
         sub.run.return_value = p
-        h.alembic()
+        alembic(h)
         # TODO: print(migration done)
         sub.run.assert_called_with(
             [
@@ -187,7 +98,7 @@ class TestHerokuMigrate(unittest.TestCase):
             stderr=mock.ANY,
         )
 
-    @mock.patch("pyramid_heroku.migrate.subprocess")
+    @mock.patch("pyramid_heroku.subprocess")
     @mock.patch("pyramid_heroku.migrate.print")
     @mock.patch("pyramid_heroku.migrate.sleep")
     @responses.activate
@@ -196,7 +107,7 @@ class TestHerokuMigrate(unittest.TestCase):
         p = mock.Mock()
         p.stdout = b"head"
         sub.run.return_value = p
-        h.migrate()
+        migrate(h)
         sub.run.assert_called_with(
             [
                 "alembic",
@@ -209,21 +120,19 @@ class TestHerokuMigrate(unittest.TestCase):
             stdout=mock.ANY,
             stderr=mock.ANY,
         )
-        out.assert_has_calls(
-            [call("head"), call("Database migration is not needed")], any_order=True
-        )
+        out.assert_has_calls([call("Database migration is not needed")], any_order=True)
 
-    @mock.patch("pyramid_heroku.migrate.subprocess")
+    @mock.patch("pyramid_heroku.subprocess")
     @mock.patch("pyramid_heroku.migrate.print")
     @mock.patch("pyramid_heroku.migrate.sleep")
-    @mock.patch("pyramid_heroku.migrate.Session")
+    @mock.patch("pyramid_heroku.heroku.Session")
     @responses.activate
     def test_migrate_with_maintenance_mode(self, ses, sleep, out, sub):
 
         h = self.Heroku("test", "etc/production.ini")
         h.get_maintenance = mock.Mock(return_value=False)
         h.set_maintenance = mock.Mock()
-        h.migrate()
+        migrate(h)
 
         h.set_maintenance.assert_has_calls([call(True), call(False)])
         sub.run.assert_called_with(
@@ -240,20 +149,19 @@ class TestHerokuMigrate(unittest.TestCase):
             stderr=mock.ANY,
         )
 
-    @mock.patch("pyramid_heroku.migrate.Heroku.set_maintenance")
-    @mock.patch("pyramid_heroku.migrate.subprocess")
+    @mock.patch("pyramid_heroku.subprocess")
     @mock.patch("pyramid_heroku.migrate.print")
     @mock.patch("pyramid_heroku.migrate.sleep")
-    @mock.patch("pyramid_heroku.migrate.Session")
+    @mock.patch("pyramid_heroku.heroku.Session")
     @responses.activate
-    def test_migrate_skip_setting_maintenance_mode(self, ses, sleep, out, sub, set_maintenance):
+    def test_migrate_skip_setting_maintenance_mode(self, ses, sleep, out, sub):
 
         h = self.Heroku("test", "etc/production.ini")
         h.get_maintenance = mock.Mock(return_value=True)
         h.set_maintenance = mock.Mock()
-        h.migrate()
+        migrate(h)
 
-        assert not set_maintenance.called
+        assert not h.set_maintenance.called
         sub.run.assert_called_with(
             [
                 "alembic",
@@ -268,11 +176,10 @@ class TestHerokuMigrate(unittest.TestCase):
             stderr=mock.ANY,
         )
 
-
-    @mock.patch("pyramid_heroku.migrate.subprocess")
-    @mock.patch("pyramid_heroku.migrate.print")
+    @mock.patch("pyramid_heroku.subprocess")
+    @mock.patch("pyramid_heroku.print")
     @mock.patch("pyramid_heroku.migrate.sleep")
-    @mock.patch("pyramid_heroku.migrate.Session")
+    @mock.patch("pyramid_heroku.heroku.Session")
     @responses.activate
     def test_migrate_non_zero(self, ses, sleep, out, sub):
         h = self.Heroku("test", "etc/production.ini")
@@ -283,6 +190,6 @@ class TestHerokuMigrate(unittest.TestCase):
         sub.run.return_value = p
 
         with pytest.raises(Exception):
-            h.migrate()
+            migrate(h)
 
         out.assert_has_calls([call("foo"), call("bar", file=mock.ANY)], any_order=True)

@@ -9,6 +9,14 @@ Changes
    This helps when we want to enable/disable the maintenance mode manually or externally.
    [sayanarijit]
 
+ * Add options to manually enable or disable Heroku maintenance mode.
+   Use `pyramid_heroku.maintenance` script to manage the maintenance state.
+   [sayanarijit]
+
+ * Heroku API client related code has been moved from `pyramid_heroku.migrate` to
+   `pyramid_heroku.heroku`, while the `shell` function is now in `pyramid_heroku`.
+   [sayanarijit]
+
 
 0.7.0
 -----
