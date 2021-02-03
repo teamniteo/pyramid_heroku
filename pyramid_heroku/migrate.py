@@ -110,6 +110,11 @@ class Heroku(object):
         """
         self.shell(f"alembic -c etc/alembic.ini -x ini={self.ini_file} upgrade head")
 
+    def get_maintenance(self) -> bool:
+        res = self.session.get(f"{self.api_endpoint}/apps/{self.app_name}")
+        self.parse_response(res)
+        return res.json()["maintenance"]
+
     def set_maintenance(self, state: bool) -> None:
         res = self.session.patch(
             f"{self.api_endpoint}/apps/{self.app_name}", json=dict(maintenance=state)
@@ -135,13 +140,17 @@ class Heroku(object):
         print(self.ini_file)
 
         if self.needs_migrate():
-            self.set_maintenance(True)
+            was_in_maintenance = self.get_maintenance()
+            if not was_in_maintenance:
+                self.set_maintenance(True)
             self.scale_down()
             sleep(30)
             self.alembic()
             self.scale_up()
             sleep(30)
-            self.set_maintenance(False)
+            if not was_in_maintenance:
+                # Don't disable maintenance mode if it was enabled externally.
+                self.set_maintenance(False)
         else:
             print("Database migration is not needed")
 

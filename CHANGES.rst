@@ -2,6 +2,14 @@
 Changes
 =======
 
+0.8.0
+-----
+
+ * Do not touch Heroku maintenance mode during migration if it's already enabled.
+   This helps when we want to enable/disable the maintenance mode manually or externally.
+   [sayanarijit]
+
+
 0.7.0
 -----
 
