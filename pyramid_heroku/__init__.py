@@ -3,7 +3,25 @@
 from ast import literal_eval
 from expandvars import expandvars
 
+import shlex
+import subprocess
+import sys
 import typing as t
+
+
+def shell(cmd: str) -> str:
+    """
+    Run shell command.
+
+    :param cmd: shell command to run
+    :return: stdout of command
+    """
+
+    p = subprocess.run(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(p.stdout.decode())
+    print(p.stderr.decode(), file=sys.stderr)
+    p.check_returncode()
+    return p.stdout.decode()
 
 
 def safe_eval(text: str) -> t.Optional[str]:
