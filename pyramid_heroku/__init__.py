@@ -3,7 +3,6 @@
 from ast import literal_eval
 from expandvars import expandvars
 
-import sys
 import typing as t
 
 
