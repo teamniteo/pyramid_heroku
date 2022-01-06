@@ -22,7 +22,7 @@ Changes
 -----
 
  * Add `pyramid_heroku.Host` tween to support AutoIdle add-on. Refs:
-   https://github.com/niteoweb/pyramid-realworld-example-app/issues/127
+   https://github.com/teamniteo/pyramid-realworld-example-app/issues/127
    [zupo]
 
 
@@ -31,7 +31,7 @@ Changes
 
  * Update how alembic should be called in migrate.py. This is to reflect the
    latest changes to pyramid_deferred_sqla:
-   https://github.com/niteoweb/pyramid_deferred_sqla/commit/b963702cab3934116fb00b6ef186959bc1627026
+   https://github.com/teamniteo/pyramid_deferred_sqla/commit/b963702cab3934116fb00b6ef186959bc1627026
    [zupo]
 
 
@@ -111,7 +111,7 @@ Changes
 0.1.3
 -----
 
-* Provided default values for migrate.py - https://github.com/niteoweb/pyramid_heroku/issues/2
+* Provided default values for migrate.py - https://github.com/teamniteo/pyramid_heroku/issues/2
   [enkidulan]
 
 0.1.2

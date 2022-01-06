@@ -22,7 +22,7 @@ packages = [
 ]
 authors = [ "Niteo <info@niteo.co>" ]
 license = "BSD-3-Clause"
-homepage = "https://github.com/niteoweb/pyramid_heroku"
+homepage = "https://github.com/teamniteo/pyramid_heroku"
 keywords = [ "pyramid", "heroku", "pylons", "web" ]
 
 [tool.poetry.dependencies]
