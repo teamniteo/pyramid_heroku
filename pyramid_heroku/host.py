@@ -16,7 +16,7 @@ class Host(object):
     https://devcenter.heroku.com/articles/http-routing#heroku-headers
 
     The reason we need this is to support AutoIdle's Custom Domains:
-    https://github.com/niteoweb/pyramid-realworld-example-app/issues/127#issuecomment-711894122
+    https://github.com/teamniteo/pyramid-realworld-example-app/issues/127#issuecomment-711894122
     """
 
     def __init__(self, handler, registry):

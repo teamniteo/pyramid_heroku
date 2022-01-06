@@ -25,7 +25,7 @@ class ClientAddr(object):
     the last IP in the ``X-Forwarded-For`` list and makes it the only IP
     in the list. This effectively causes pyramid to return this real IP for
     ``request.client_addr``. Read rationale behind why we do this on
-    https://github.com/niteoweb/heroku_ips.
+    https://github.com/teamniteo/heroku_ips.
     """
 
     def __init__(self, handler, registry):
