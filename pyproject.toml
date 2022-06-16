@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyramid_heroku"
-version = "0.8.0"
+version = "0.9.0"
 description = "A bunch of helpers for successfully running Pyramid on Heroku."
 readme = "README.rst"
 include = [ "CHANGES.rst", "COPYING.txt" ]
