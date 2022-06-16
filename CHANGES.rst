@@ -2,6 +2,22 @@
 Changes
 =======
 
+0.9.0
+-----
+
+ * Don't use Cloudflare IPs for client_addr. ClientAddr tween now sets a
+   correct IP when using Cloudflare's reverse proxy. The tween fetches the list
+   of Cloudflare's IPs on pyramid app start and ignores Cloudflare's IPs in
+   `X-Forwarded-For` header.
+   [am-on]
+
+ * Bump year to 2022
+   [am-on]
+
+ * Rename niteoweb -> teamniteo
+   [zupo]
+
+
 0.8.0
 -----
 
