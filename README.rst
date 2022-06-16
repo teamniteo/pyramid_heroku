@@ -51,6 +51,10 @@ The ``pyramid_heroku.herokuapp_access`` tween depends on
 ``pyramid_heroku.client_addr`` tween and it requires you to list whitelisted IPs
 in the ``pyramid_heroku.herokuapp_whitelist`` setting.
 
+The ``pyramid_heroku.client_addr`` tween sets request.client_addr to an IP we
+can trust. It handles IP spoofing via ``X-Forwarded-For`` headers and
+ignores Cloudflare's IPs when using Cloudflare reverse proxy.
+
 
 Usage example for automatic alembic migration script::
 
