@@ -2,7 +2,7 @@
 Changes
 =======
 
-0.9.0
+0.9.1
 -----
 
  * Don't use Cloudflare IPs for client_addr. ClientAddr tween now sets a
