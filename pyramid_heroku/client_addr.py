@@ -1,6 +1,6 @@
 """Set client_addr IP that we can trust."""
-from ipaddress import IPv4Address
-from ipaddress import IPv4Network
+from ipaddress import ip_address
+from ipaddress import ip_network
 
 import logging
 import requests
@@ -41,6 +41,14 @@ class ClientAddr(object):
     def __init__(self, handler, registry):
         self.handler = handler
         self.registry = registry
+
+        if self.registry.settings.get("pyramid_heroku.structlog"):
+            import structlog
+
+            self.logger = structlog.getLogger(__name__)
+        else:
+            self.logger = logging.getLogger(__name__)
+
         self.ignored_ip_networks = self.get_cloudflare_ip_networks()
 
     def __call__(self, request):
@@ -56,26 +64,33 @@ class ClientAddr(object):
     def remove_ignored_ips(self, ips):
         """Remove ignored IPs from the list."""
         for ip in ips:
+            try:
+                address = ip_address(ip)
+            except ValueError as e:
+                self.logger.info("Ignoring invalid IP address", exc_info=e)
+                continue
+
             is_ignored = any(
-                [IPv4Address(ip) in network for network in self.ignored_ip_networks]
+                [address in network for network in self.ignored_ip_networks]
             )
             if not is_ignored:
                 yield ip
 
-    def get_cloudflare_ip_networks(self):
-        """Get the list of Cloudflare's current IP ranges."""
+    def get_ip_networks_from_url(self, url):
+        """Get the list of IP networks from given url."""
         try:
-            res = requests.get("https://www.cloudflare.com/ips-v4", timeout=10)
+            res = requests.get(url, timeout=10)
             res.raise_for_status()
-            return [IPv4Network(n) for n in res.text.split()]
+            return [ip_network(n) for n in res.text.split()]
         except Exception as e:
-            if self.registry.settings.get("pyramid_heroku.structlog"):
-                import structlog
-
-                logger = structlog.getLogger(__name__)
-            else:
-
-                logger = logging.getLogger(__name__)
-            logger.exception("Failed getting a list of Cloudflare IPs", exc_info=e)
+            self.logger.exception(
+                f"Failed getting a list of IPs from {url}", exc_info=e
+            )
 
             return []
+
+    def get_cloudflare_ip_networks(self):
+        """Get the list of Cloudflare's current IP ranges."""
+        ipv4 = self.get_ip_networks_from_url("https://www.cloudflare.com/ips-v4")
+        ipv6 = self.get_ip_networks_from_url("https://www.cloudflare.com/ips-v6")
+        return ipv4 + ipv6

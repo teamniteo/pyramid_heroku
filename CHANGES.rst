@@ -2,6 +2,15 @@
 Changes
 =======
 
+0.9.2
+-----
+
+ * Handle IPv6 in client_addr tween. ClientAddr tween was crashing when getting
+   IPv6 addresses. Use IP version agnostic parsing. Fetch the list of
+   CloudFlare's IPv6 IPs.
+   [am-on]
+
+
 0.9.1
 -----
 
