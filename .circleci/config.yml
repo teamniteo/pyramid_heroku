@@ -37,4 +37,9 @@ jobs:
 
       - run:
           name: Test
-          command: poetry run pytest --cov=pyramid_heroku --cov-fail-under=100
+          command: poetry run pytest --junitxml junit.xml --cov=pyramid_heroku --cov-fail-under=100
+
+      - run:
+          name: Upload results to blueracer.io
+          command: |
+            bash <(curl -s https://app.blueracer.io/upload)
