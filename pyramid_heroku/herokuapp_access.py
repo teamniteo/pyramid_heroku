@@ -27,10 +27,8 @@ class HerokuappAccess(object):
 
     def __call__(self, request):
         whitelisted_ips = request.registry.settings.get(
-            "pyramid_heroku.herokuapp_whitelist"
+            "pyramid_heroku.herokuapp_whitelist", []
         )
-        if not whitelisted_ips:
-            return self.handler(request)
 
         if (
             "herokuapp.com" in request.headers["Host"]
