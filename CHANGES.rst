@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.10
+----
+
+ * Enforce HerokuappAccess whitelisting even if list is unset/empty.
+   [zupo]
+
+
 0.9.2
 -----
 
