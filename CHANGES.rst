@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.10.2
+------
+
+  * Log allowed IPs for easier debugging.
+    [zupo]
+
+
 0.10.1
 ------
 
