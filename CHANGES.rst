@@ -2,6 +2,14 @@
 Changes
 =======
 
+0.10.1
+------
+
+  * Refactor `pyramid_heroku.herokuapp_allowlist` to
+    `pyramid_heroku.herokuapp_allowlist`.
+    [zupo]
+
+
 0.10
 ----
 

@@ -8,9 +8,9 @@ pyramid_heroku is a collection of tweens and helpers to successfully run `Pyrami
 
 It provides the following:
 
-* ``ClientAddr`` tween that sets real user's IP to ``request.client_addr``. Without this tween you cannot do IP-based geolocation, IP whitelisting, etc.
+* ``ClientAddr`` tween that sets real user's IP to ``request.client_addr``. Without this tween you cannot do IP-based geolocation, IP allowlisting, etc.
 * ``Host`` tween that sets `request.host` to proxied `X-Forwarded-Host` header (note: potential security risk)
-* ``HerokuappAccess`` tween that denies access to your app's ``<app>.herokuapp.com`` domain for any non-whitelisted IPs. This is helpful because you don't want anyone outside your team (i.e. usual visitors/users and search bots) to be able to visit ``<app>.heroku.com`` besides the domain the app is deployed on. This is for security and SEO purposes. 
+* ``HerokuappAccess`` tween that denies access to your app's ``<app>.herokuapp.com`` domain for any non-allowlisted IPs. This is helpful because you don't want anyone outside your team (i.e. usual visitors/users and search bots) to be able to visit ``<app>.heroku.com`` besides the domain the app is deployed on. This is for security and SEO purposes. 
 * ``migrate.py`` script for automatically running alembic migrations on deploy.
 * ``maintenance.py`` script for controlling Heroku maintenance mode.
 
@@ -46,8 +46,8 @@ Usage example for tweens::
         return config.make_wsgi_app()
 
 The ``pyramid_heroku.herokuapp_access`` tween depends on
-``pyramid_heroku.client_addr`` tween and it requires you to list whitelisted IPs
-in the ``pyramid_heroku.herokuapp_whitelist`` setting.
+``pyramid_heroku.client_addr`` tween and it requires you to list allowlisted IPs
+in the ``pyramid_heroku.herokuapp_allowlist`` setting.
 
 The ``pyramid_heroku.client_addr`` tween sets request.client_addr to an IP we
 can trust. It handles IP spoofing via ``X-Forwarded-For`` headers and
