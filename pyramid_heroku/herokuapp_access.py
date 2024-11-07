@@ -27,8 +27,8 @@ class HerokuappAccess(object):
 
     def __call__(self, request):
         allowlisted_ips = request.registry.settings.get(
-            "pyramid_heroku.herokuapp_allowlist", []
-        )
+            "pyramid_heroku.herokuapp_allowlist", ""
+        ).split("\n")
 
         if (
             "herokuapp.com" in request.headers["Host"]

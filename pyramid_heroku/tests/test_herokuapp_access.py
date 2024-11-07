@@ -24,7 +24,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.handler = mock.Mock()
         self.request = testing.DummyRequest()
         self.request.registry.settings = {
-            "pyramid_heroku.herokuapp_allowlist": ["1.2.3.4"],
+            "pyramid_heroku.herokuapp_allowlist": "\n1.2.3.4\n5.6.7.8",
             "pyramid_heroku.structlog": 1,
         }
         structlog.configure(processors=[self.wrap_logger], context_class=dict)
@@ -97,7 +97,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
 
         self.request.client_addr = "6.6.6.6"
         self.request.headers = {"Host": "foo.herokuapp.com"}
-        self.request.registry.settings = {"pyramid_heroku.herokuapp_allowlist": []}
+        self.request.registry.settings = {"pyramid_heroku.herokuapp_allowlist": ""}
 
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         assert not self.handler.called, "handler should not be called"
