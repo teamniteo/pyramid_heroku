@@ -41,6 +41,7 @@ class HerokuappAccess(object):
                 logger.info(
                     "Herokuapp access denied",
                     user_ip=request.client_addr,
+                    allowed_ips=", ".join(allowlisted_ips),
                     host=request.headers["Host"],
                 )
             else:
