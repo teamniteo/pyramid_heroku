@@ -1,4 +1,4 @@
-"""Prevent .herokuapp.com access to non-whitelisted IPs"""
+"""Prevent .herokuapp.com access to non-allowlisted IPs"""
 
 from pyramid.response import Response
 
@@ -10,11 +10,11 @@ def includeme(config):
 
 
 class HerokuappAccess(object):
-    """Deny access to 'herokuapp.com' urls for IPs that are not whitelisted.
+    """Deny access to 'herokuapp.com' urls for IPs that are not allowlisted.
 
     Denies access to hosts that contain 'herokuapp.com' to ips that are not
-    whitelisted. Registry settings must contain a key
-    'pyramid_heroku.herokuapp_whitelist', whose value must be a list of
+    allowlisted. Registry settings must contain a key
+    'pyramid_heroku.herokuapp_allowlist', whose value must be a list of
     strings (IPs). For this tween to work, you must include the
     ClientAddr tween and make sure this tween executes after the ClientAddr
     tween.
@@ -26,13 +26,13 @@ class HerokuappAccess(object):
         self.settings = getattr(registry, "settings", {})
 
     def __call__(self, request):
-        whitelisted_ips = request.registry.settings.get(
-            "pyramid_heroku.herokuapp_whitelist", []
+        allowlisted_ips = request.registry.settings.get(
+            "pyramid_heroku.herokuapp_allowlist", []
         )
 
         if (
             "herokuapp.com" in request.headers["Host"]
-            and request.client_addr not in whitelisted_ips
+            and request.client_addr not in allowlisted_ips
         ):
             if request.registry.settings.get("pyramid_heroku.structlog"):
                 import structlog

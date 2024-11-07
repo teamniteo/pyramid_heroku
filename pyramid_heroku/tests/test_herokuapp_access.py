@@ -24,7 +24,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.handler = mock.Mock()
         self.request = testing.DummyRequest()
         self.request.registry.settings = {
-            "pyramid_heroku.herokuapp_whitelist": ["1.2.3.4"],
+            "pyramid_heroku.herokuapp_allowlist": ["1.2.3.4"],
             "pyramid_heroku.structlog": 1,
         }
         structlog.configure(processors=[self.wrap_logger], context_class=dict)
@@ -33,7 +33,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         tweens_handler.clear()
         testing.tearDown()
 
-    def test_whitelisted_ip(self):
+    def test_allowlisted_ip(self):
         from pyramid_heroku.herokuapp_access import HerokuappAccess
 
         self.request.client_addr = "1.2.3.4"
@@ -42,7 +42,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         self.handler.assert_called_with(self.request)
 
-    def test_non_whitelisted_ip(self):
+    def test_non_allowlisted_ip(self):
         from pyramid_heroku.herokuapp_access import HerokuappAccess
 
         self.request.client_addr = "6.6.6.6"
@@ -80,8 +80,8 @@ class TestHerokuappAccessTween(unittest.TestCase):
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         self.handler.assert_called_with(self.request)
 
-    def test_herokuapp_whitelist_not_set(self):
-        "Even if whitelist is not set, the protection should still work."
+    def test_herokuapp_allowlist_not_set(self):
+        "Even if allowlist is not set, the protection should still work."
         from pyramid_heroku.herokuapp_access import HerokuappAccess
 
         self.request.client_addr = "6.6.6.6"
@@ -91,13 +91,13 @@ class TestHerokuappAccessTween(unittest.TestCase):
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         assert not self.handler.called, "handler should not be called"
 
-    def test_herokuapp_whitelist_empty(self):
-        "Even if whitelist is empty, the protection should still work."
+    def test_herokuapp_allowlist_empty(self):
+        "Even if allowlist is empty, the protection should still work."
         from pyramid_heroku.herokuapp_access import HerokuappAccess
 
         self.request.client_addr = "6.6.6.6"
         self.request.headers = {"Host": "foo.herokuapp.com"}
-        self.request.registry.settings = {"pyramid_heroku.herokuapp_whitelist": []}
+        self.request.registry.settings = {"pyramid_heroku.herokuapp_allowlist": []}
 
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         assert not self.handler.called, "handler should not be called"

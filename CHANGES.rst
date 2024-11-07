@@ -2,6 +2,21 @@
 Changes
 =======
 
+0.10.1
+------
+
+  * Refactor `pyramid_heroku.herokuapp_allowlist` to
+    `pyramid_heroku.herokuapp_allowlist`.
+    [zupo]
+
+
+0.10
+----
+
+ * Enforce HerokuappAccess whitelisting even if list is unset/empty.
+   [zupo]
+
+
 0.9.2
 -----
 
