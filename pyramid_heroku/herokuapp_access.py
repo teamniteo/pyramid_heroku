@@ -3,10 +3,14 @@
 from pyramid.response import Response
 
 import logging
+import os
 
 
 def includeme(config):
-    config.add_tween("pyramid_heroku.herokuapp_access.HerokuappAccess")
+    config.add_tween(
+        "pyramid_heroku.herokuapp_access.HerokuappAccess",
+        under="pyramid_heroku.client_addr.ClientAddr",
+    )
 
 
 class HerokuappAccess(object):
@@ -20,6 +24,8 @@ class HerokuappAccess(object):
     tween.
     """
 
+    import os
+
     def __init__(self, handler, registry):
         self.handler = handler
         self.registry = registry
@@ -29,6 +35,23 @@ class HerokuappAccess(object):
         allowlisted_ips = request.registry.settings.get(
             "pyramid_heroku.herokuapp_allowlist", ""
         ).split("\n")
+
+        if os.environ.get("HEROKUAPP_ACCESS_BYPASS"):
+            if request.headers.get("HEROKUAPP_ACCESS_BYPASS") == os.environ.get(
+                "HEROKUAPP_ACCESS_BYPASS"
+            ):
+                if request.registry.settings.get("pyramid_heroku.structlog"):
+                    import structlog
+
+                    logger = structlog.getLogger(__name__)
+                    logger.info(
+                        "Herokuapp access bypassed", user_ip=request.client_addr
+                    )
+                else:
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"Herokuapp access bypassed by {request.client_addr}")
+
+                return self.handler(request)
 
         if (
             "herokuapp.com" in request.headers["Host"]

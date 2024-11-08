@@ -5,6 +5,7 @@ from zope.testing.loggingsupport import InstalledHandler
 
 import logging
 import mock
+import os
 import structlog
 import unittest
 
@@ -66,7 +67,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         assert not self.handler.called, "handler should not be called"
         self.assertEqual(len(tweens_handler.records), 1)
         self.assertEqual(
-            "Denied Herokuapp access for Host foo.herokuapp.com and IP 6.6.6.6",  # noqa
+            "Denied Herokuapp access for Host foo.herokuapp.com and IP 6.6.6.6",
             tweens_handler.records[0].msg,
         )
         self.assertEqual(response.status_code, 403)
@@ -98,6 +99,49 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.client_addr = "6.6.6.6"
         self.request.headers = {"Host": "foo.herokuapp.com"}
         self.request.registry.settings = {"pyramid_heroku.herokuapp_allowlist": ""}
+
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        assert not self.handler.called, "handler should not be called"
+
+    @mock.patch.dict(os.environ, {"HEROKUAPP_ACCESS_BYPASS": "foo"})
+    def test_herokuapp_access_bypass(self):
+        "The IP check can be bypassed by setting a correct header."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.client_addr = "6.6.6.6"
+        self.request.headers = {
+            "Host": "foo.herokuapp.com",
+            "HEROKUAPP_ACCESS_BYPASS": "foo",
+        }
+
+        # structlog version
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        self.handler.assert_called_with(self.request)
+        self.assertEqual(len(tweens_handler.records), 1)
+        self.assertEqual("Herokuapp access bypassed", tweens_handler.records[0].msg)
+
+        # standard logging version
+        self.request.registry.settings["pyramid_heroku.structlog"] = False
+        tweens_handler.clear()
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        self.handler.assert_called_with(self.request)
+        self.assertEqual(len(tweens_handler.records), 1)
+        self.assertEqual(
+            "Herokuapp access bypassed by 6.6.6.6",
+            tweens_handler.records[0].msg,
+        )
+
+    @mock.patch.dict(os.environ, {"HEROKUAPP_ACCESS_BYPASS": "foo"})
+    def test_herokuapp_access_bypass_invalid(self):
+        "Invalid bypass code is rejected."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.client_addr = "6.6.6.6"
+        self.request.headers = {
+            "Host": "foo.herokuapp.com",
+            "HEROKUAPP_ACCESS_BYPASS": "bar",
+        }
+        self.request.registry.settings = {}
 
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         assert not self.handler.called, "handler should not be called"
