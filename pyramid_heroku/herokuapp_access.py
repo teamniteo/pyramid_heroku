@@ -37,7 +37,7 @@ class HerokuappAccess(object):
         ).split("\n")
 
         if os.environ.get("HEROKUAPP_ACCESS_BYPASS"):
-            if request.headers.get("HEROKUAPP_ACCESS_BYPASS") == os.environ.get(
+            if request.headers.get("User-Agent") == os.environ.get(
                 "HEROKUAPP_ACCESS_BYPASS"
             ):
                 if request.registry.settings.get("pyramid_heroku.structlog"):

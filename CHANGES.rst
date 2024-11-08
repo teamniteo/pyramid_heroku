@@ -2,10 +2,24 @@
 Changes
 =======
 
-0.10.4
+0.10.6
+------
+
+  * Bypass needs to be settable via User-Agent so it works with splinter tests.
+    [zupo]
+
+
+0.10.5
 ------
 
   * Add bypass of herokuapp access restriction.
+    [zupo]
+
+
+0.10.4
+------
+
+  * Brown bag release.
     [zupo]
 
 

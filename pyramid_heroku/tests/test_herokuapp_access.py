@@ -111,7 +111,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.client_addr = "6.6.6.6"
         self.request.headers = {
             "Host": "foo.herokuapp.com",
-            "HEROKUAPP_ACCESS_BYPASS": "foo",
+            "User-Agent": "foo",
         }
 
         # structlog version
@@ -139,7 +139,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.client_addr = "6.6.6.6"
         self.request.headers = {
             "Host": "foo.herokuapp.com",
-            "HEROKUAPP_ACCESS_BYPASS": "bar",
+            "User-Agent": "bar",
         }
         self.request.registry.settings = {}
 
