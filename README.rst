@@ -47,7 +47,10 @@ Usage example for tweens::
 
 The ``pyramid_heroku.herokuapp_access`` tween depends on
 ``pyramid_heroku.client_addr`` tween and it requires you to list allowlisted IPs
-in the ``pyramid_heroku.herokuapp_allowlist`` setting.
+in the ``pyramid_heroku.herokuapp_allowlist`` setting. A bypass is possible
+by setting the `HEROKUAPP_ACCESS_BYPASS` environment variable to a secret value
+and then sending a request with the `HEROKUAPP_ACCESS_BYPASS` header set to the
+same secret value.
 
 The ``pyramid_heroku.client_addr`` tween sets request.client_addr to an IP we
 can trust. It handles IP spoofing via ``X-Forwarded-For`` headers and
