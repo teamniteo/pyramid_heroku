@@ -2,6 +2,13 @@
 Changes
 =======
 
+0.10.4
+------
+
+  * Add bypass of herokuapp access restriction.
+    [zupo]
+
+
 0.10.3
 ------
   
