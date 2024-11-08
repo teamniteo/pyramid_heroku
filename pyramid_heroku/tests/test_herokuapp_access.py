@@ -39,7 +39,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.client_addr = "1.2.3.4"
         self.request.headers = {"Host": "foo.herokuapp.com"}
 
-        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        HerokuappAccess(self.handler)(self.request)
         self.handler.assert_called_with(self.request)
 
     def test_non_allowlisted_ip(self):
@@ -51,7 +51,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         # structlog version
         # wrap structlog around a regular logger so that zope's logging support
         # still gets the logged messages
-        response = HerokuappAccess(self.handler, self.request.registry)(self.request)
+        response = HerokuappAccess(self.handler)(self.request)
         assert not self.handler.called, "handler should not be called"
         self.assertEqual(len(tweens_handler.records), 1)
         self.assertEqual(
@@ -62,7 +62,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         # standard logging version
         self.request.registry.settings["pyramid_heroku.structlog"] = False
         tweens_handler.clear()
-        response = HerokuappAccess(self.handler, self.request.registry)(self.request)
+        response = HerokuappAccess(self.handler)(self.request)
         assert not self.handler.called, "handler should not be called"
         self.assertEqual(len(tweens_handler.records), 1)
         self.assertEqual(
@@ -77,7 +77,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.client_addr = "6.6.6.6"
         self.request.headers = {"Host": "foo.bar.com"}
 
-        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        HerokuappAccess(self.handler)(self.request)
         self.handler.assert_called_with(self.request)
 
     def test_herokuapp_allowlist_not_set(self):
@@ -88,7 +88,7 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.headers = {"Host": "foo.herokuapp.com"}
         self.request.registry.settings = {}
 
-        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        HerokuappAccess(self.handler)(self.request)
         assert not self.handler.called, "handler should not be called"
 
     def test_herokuapp_allowlist_empty(self):
@@ -99,5 +99,5 @@ class TestHerokuappAccessTween(unittest.TestCase):
         self.request.headers = {"Host": "foo.herokuapp.com"}
         self.request.registry.settings = {"pyramid_heroku.herokuapp_allowlist": ""}
 
-        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        HerokuappAccess(self.handler)(self.request)
         assert not self.handler.called, "handler should not be called"

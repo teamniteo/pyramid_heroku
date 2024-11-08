@@ -20,10 +20,8 @@ class HerokuappAccess(object):
     tween.
     """
 
-    def __init__(self, handler, registry):
+    def __init__(self, handler):
         self.handler = handler
-        self.registry = registry
-        self.settings = getattr(registry, "settings", {})
 
     def __call__(self, request):
         allowlisted_ips = request.registry.settings.get(
