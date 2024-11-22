@@ -14,7 +14,7 @@ def needs_migrate(heroku: Heroku) -> bool:
 
     :return: True if current alembic branch is not up to date.
     """
-    cmd = shell(f"alembic -c etc/alembic.ini -x ini={heroku.ini_file} current")
+    cmd = shell(f"alembic -c {heroku.ini_file} current")
     return "head" not in cmd
 
 
@@ -22,7 +22,7 @@ def alembic(heroku: Heroku) -> None:
     """
     Run alembic migrations.
     """
-    shell(f"alembic -c etc/alembic.ini -x ini={heroku.ini_file} upgrade head")
+    shell(f"alembic -c {heroku.ini_file} upgrade head")
 
 
 def migrate(heroku: Heroku) -> None:
