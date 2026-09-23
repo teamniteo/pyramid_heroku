@@ -145,3 +145,110 @@ class TestHerokuappAccessTween(unittest.TestCase):
 
         HerokuappAccess(self.handler, self.request.registry)(self.request)
         assert not self.handler.called, "handler should not be called"
+
+    def test_custom_hosts_replace_the_default(self):
+        "Naming hosts gates those and stops gating herokuapp.com."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.registry.settings["pyramid_heroku.herokuapp_hosts"] = "fly.dev"
+        self.request.client_addr = "6.6.6.6"
+
+        self.request.headers = {"Host": "foo.fly.dev"}
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        assert not self.handler.called, "fly.dev should be gated"
+
+        self.request.headers = {"Host": "foo.herokuapp.com"}
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        self.handler.assert_called_with(self.request)
+
+    def test_several_hosts(self):
+        "An app mid-migration can gate both platforms."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.registry.settings[
+            "pyramid_heroku.herokuapp_hosts"
+        ] = "herokuapp.com\nfly.dev"
+        self.request.client_addr = "6.6.6.6"
+
+        for host in ("foo.herokuapp.com", "foo.fly.dev"):
+            self.handler.reset_mock()
+            self.request.headers = {"Host": host}
+            HerokuappAccess(self.handler, self.request.registry)(self.request)
+            assert not self.handler.called, f"{host} should be gated"
+
+    def test_whole_labels_only(self):
+        "A lookalike hostname is not ours to gate, nor to let through as ours."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.client_addr = "6.6.6.6"
+        for host in ("herokuapp.com.attacker.example", "notherokuapp.com"):
+            self.request.headers = {"Host": host}
+            HerokuappAccess(self.handler, self.request.registry)(self.request)
+            self.handler.assert_called_with(self.request)
+
+    def test_host_with_port(self):
+        "A port in the Host header does not hide the hostname."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.client_addr = "6.6.6.6"
+        self.request.headers = {"Host": "foo.herokuapp.com:8080"}
+
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        assert not self.handler.called, "handler should not be called"
+
+    def test_client_addr_header(self):
+        "The caller can be read from a header the platform guarantees."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.registry.settings["pyramid_heroku.herokuapp_hosts"] = "fly.dev"
+        self.request.registry.settings[
+            "pyramid_heroku.client_addr_header"
+        ] = "Fly-Client-IP"
+        self.request.client_addr = "6.6.6.6"
+
+        self.request.headers = {"Host": "foo.fly.dev", "Fly-Client-IP": "1.2.3.4"}
+        HerokuappAccess(self.handler, self.request.registry)(self.request)
+        self.handler.assert_called_with(self.request)
+
+    def test_client_addr_header_missing(self):
+        "Without the header the caller is nobody, and nobody is not allowlisted."
+        from pyramid_heroku.herokuapp_access import HerokuappAccess
+
+        self.request.registry.settings["pyramid_heroku.herokuapp_hosts"] = "fly.dev"
+        self.request.registry.settings[
+            "pyramid_heroku.client_addr_header"
+        ] = "Fly-Client-IP"
+        self.request.client_addr = "1.2.3.4"
+        self.request.headers = {"Host": "foo.fly.dev"}
+
+        response = HerokuappAccess(self.handler, self.request.registry)(self.request)
+        assert not self.handler.called, "handler should not be called"
+        self.assertEqual(response.status_code, 403)
+
+    def test_includeme_without_client_addr(self):
+        "The tween can be included on its own, without the client_addr tween."
+        from pyramid.config import Configurator
+        from pyramid.interfaces import ITweens
+
+        config = Configurator()
+        config.include("pyramid_heroku.herokuapp_access")
+        config.commit()
+
+        names = [n for n, _ in config.registry.queryUtility(ITweens).implicit()]
+        self.assertIn("pyramid_heroku.herokuapp_access.HerokuappAccess", names)
+
+    def test_includeme_under_client_addr(self):
+        "When the client_addr tween is present, this one sits below it."
+        from pyramid.config import Configurator
+        from pyramid.interfaces import ITweens
+
+        config = Configurator()
+        config.include("pyramid_heroku.client_addr")
+        config.include("pyramid_heroku.herokuapp_access")
+        config.commit()
+
+        names = [n for n, _ in config.registry.queryUtility(ITweens).implicit()]
+        self.assertGreater(
+            names.index("pyramid_heroku.herokuapp_access.HerokuappAccess"),
+            names.index("pyramid_heroku.client_addr.ClientAddr"),
+        )
