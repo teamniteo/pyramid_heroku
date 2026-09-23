@@ -2,6 +2,23 @@
 Changes
 =======
 
+0.12
+----
+
+  * Add ``pyramid_heroku.herokuapp_hosts`` for naming the platform hostnames to
+    gate, such as ``fly.dev``, and ``pyramid_heroku.client_addr_header`` for
+    reading the caller from a header the platform guarantees, such as
+    Fly.io's ``Fly-Client-IP``. Defaults keep Heroku apps unchanged.
+    [zupo]
+
+  * Match gated hostnames by whole domain labels rather than by substring, so
+    that ``herokuapp.com.attacker.example`` is no longer treated as ours.
+    [zupo]
+
+  * The tween no longer requires the ``client_addr`` tween to be included; it
+    is placed below it only when present.
+    [zupo]
+
 0.10.6
 ------
 
